@@ -1,6 +1,23 @@
 package com.example.ry0000tarodojo2026.data.repository
 
 import com.example.ry0000tarodojo2026.data.api.YouTubeApiService
+import java.time.Duration
+
+/**
+ * YouTubeの再生時間形式 (例: PT3M15S) を秒数 (Long) に変換する関数
+ */
+fun parseDurationToSeconds(durationString: String?): Long {
+    // データが空の場合は 0 秒として返す
+    if (durationString.isNullOrEmpty()) return 0L
+
+    return try {
+        // Durationクラスを使って文字列を解析し、トータルの秒数を取得
+        Duration.parse(durationString).seconds
+    } catch (e: Exception) {
+        // 解析に失敗した（形式が違うなど）場合は安全のために 0 秒を返す
+        0L
+    }
+}
 
 class YouTubeRepository(private val apiService: YouTubeApiService) {
 
