@@ -4,7 +4,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitInstance {
-    private const val BASE_URL = "https://www.googleapis.com/"
+    private const val BASE_URL = "https://www.googleapis.com/youtube/v3/"
 
     val api: YouTubeApiService by lazy {
         Retrofit.Builder()
