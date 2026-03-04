@@ -3,6 +3,7 @@ package com.example.ry0000tarodojo2026.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ry0000tarodojo2026.data.repository.YouTubeRepository
+import com.example.ry0000tarodojo2026.data.model.VideoData
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,24 +14,27 @@ import kotlinx.coroutines.launch
  */
 class MainViewModel(private val repository: YouTubeRepository) : ViewModel() {
 
-    // 動画IDのリストを保持する（外部からは書き換え不可）
-    private val _videoIds = MutableStateFlow<List<String>>(emptyList())
+    // ✅ 1. UIに渡す「完成した動画リスト」を保持する箱
+    private val _videoList = MutableStateFlow<List<VideoData>>(emptyList())
+    val videoList: StateFlow<List<VideoData>> = _videoList.asStateFlow()
 
-    // 画面（UI）が監視するための「窓口」（外部からは読み取り専用）
-    // videoIdをMutableStateFlowからStateFlowに変更して読み取り専用にする
-
-    val videoIds: StateFlow<List<String>> = _videoIds.asStateFlow()
+    // ✅ 2. 読み込み中かどうかを管理するフラグ（これがないとエラー！）
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
     /**
      * 動画を検索してIDリストを更新する
      */
-    fun searchVideos(apiKey: String, query: String, duration: String) {
-        // 通信（suspend関数）を動かすためのスコープ
+    fun searchVideos(apiKey: String, query: String, limitSeconds: Long = 180) {
         viewModelScope.launch {
-            // リポジトリに依頼してIDリストを取得
-            val ids = repository.fetchVideoIds(apiKey, query, duration)
-
-            // 取得した結果で動画IDリストの中身を更新する
-            _videoIds.value = ids
+            _isLoading.value = true // 通信開始！
+            try {
+                // 3. IDだけでなく、時間選別された完成品を受け取る
+                val result = repository.getVideosWithinDuration(apiKey, query, limitSeconds)
+                _videoList.value = result
+            } finally {
+                _isLoading.value = false // 通信終了（成功でも失敗でも）
+            }
         }
-    }
+        }
+
 }

@@ -70,17 +70,48 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun HomeScreen(viewModel: MainViewModel) {
+    // ① ここを videoList に書き換える（型を合わせるため）
+    val videoList by viewModel.videoList.collectAsStateWithLifecycle()
 
+    Button(
+        onClick = {
+            viewModel.searchVideos(
+                apiKey = BuildConfig.YOUTUBE_API_KEY,
+                query = "3分 フィットネス",
+                limitSeconds = 180
+            )
+        },
+        modifier = Modifier.fillMaxWidth().padding(16.dp)
+    ) {
+        Text("YouTubeで動画を検索する")
+    }
+
+    // ② リスト表示部分をいったんコメントアウトするか、videoList を使うように変える
+    LazyColumn {
+        items(videoList) { video ->
+            // ここは空でも、Text("test") だけでもOK！
+            // 大事なのは「エラーを消してアプリを動かすこと」です
+            Text(text = "取得中...", modifier = Modifier.padding(16.dp))
+        }
+    }
+}
+/*
     // ① ViewModel の StateFlow を Compose 用の状態に変換
-    val videoIds by viewModel.videoIds.collectAsStateWithLifecycle()
-
+// ① videoIds ではなく videoList を受け取るように修正
+    val videoList by viewModel.videoList.collectAsStateWithLifecycle()
+    // 読み込み状態も受け取れるようにしておくと、検索中に「待ち」がわかります
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     Button(
         onClick = {
             // APIキーと検索条件を渡して検索実行
             viewModel.searchVideos(
                 apiKey = BuildConfig.YOUTUBE_API_KEY,
                 query = "3分 フィットネス", // テスト用の検索ワード
+                /*
                 duration = "short"       // 'short' は4分未満の動画
+
+                 */
+                limitSeconds = 180
             )
         },
         modifier = Modifier.fillMaxWidth().padding(16.dp)
@@ -142,6 +173,7 @@ fun HomeScreen(viewModel: MainViewModel) {
 
  */
 }
+*/
 
 data class VideoData(
     val id: Int,
