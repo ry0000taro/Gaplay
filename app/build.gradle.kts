@@ -18,6 +18,17 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        val properties = Properties()
+        val propertiesFile = project.rootProject.file("local.properties")
+        if (propertiesFile.exists()) {
+            properties.load(propertiesFile.inputStream())
+        }
+
+        // BuildConfig に変数を追加する命令
+        buildConfigField("String",
+            "YOUTUBE_API_KEY",
+            "\"${properties.getProperty("YOUTUBE_API_KEY")}\"")
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -36,6 +47,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
