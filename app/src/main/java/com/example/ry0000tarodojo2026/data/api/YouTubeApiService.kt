@@ -30,7 +30,7 @@ interface YouTubeApiService {
         @Query("type") type: String = "video",
 
         // 最大取得件数（デフォルトは10件）
-        @Query("maxResults") maxResults: Int = 10
+        @Query("maxResults") maxResults: Int = 50
     ): YouTubeSearchResponse
 
 
