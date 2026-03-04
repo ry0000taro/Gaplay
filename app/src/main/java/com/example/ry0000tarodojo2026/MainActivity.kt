@@ -26,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -40,16 +41,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ry0000tarodojo2026.ui.theme.Ry0000tarodojo2026Theme
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.ry0000tarodojo2026.data.api.RetrofitInstance
+import com.example.ry0000tarodojo2026.data.repository.YouTubeRepository
+import com.example.ry0000tarodojo2026.ui.viewmodel.MainViewModel
+import com.example.ry0000tarodojo2026.BuildConfig
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val viewModel = MainViewModel(YouTubeRepository(RetrofitInstance.api))
         enableEdgeToEdge()
         setContent {
             Ry0000tarodojo2026Theme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Box(modifier = Modifier.padding(innerPadding)) {
-                        HomeScreen()
+                        HomeScreen(viewModel = viewModel)
                     }
                 }
 
@@ -61,7 +69,34 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(viewModel: MainViewModel) {
+
+    // ① ViewModel の StateFlow を Compose 用の状態に変換
+    val videoIds by viewModel.videoIds.collectAsStateWithLifecycle()
+
+    Button(
+        onClick = {
+            // APIキーと検索条件を渡して検索実行
+            viewModel.searchVideos(
+                apiKey = BuildConfig.YOUTUBE_API_KEY,
+                query = "3分 フィットネス", // テスト用の検索ワード
+                duration = "short"       // 'short' は4分未満の動画
+            )
+        },
+        modifier = Modifier.fillMaxWidth().padding(16.dp)
+    ) {
+        Text("YouTubeで動画を検索する")
+    }
+
+    // 結果のリスト表示
+    LazyColumn(modifier = Modifier) {
+        items(videoIds) { id ->
+            Text(text = "取得した動画ID: $id", modifier = Modifier.padding(16.dp))
+            HorizontalDivider()
+        }
+    }
+/*
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -104,6 +139,8 @@ fun HomeScreen() {
         }
 
     }
+
+ */
 }
 
 data class VideoData(
@@ -242,7 +279,7 @@ fun VideoRow(videoData: VideoData) {
         }
     }
 }
-
+/*
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
@@ -250,3 +287,4 @@ fun GreetingPreview() {
         HomeScreen()
     }
 }
+ */
