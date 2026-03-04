@@ -47,6 +47,7 @@ import com.example.ry0000tarodojo2026.data.api.RetrofitInstance
 import com.example.ry0000tarodojo2026.data.repository.YouTubeRepository
 import com.example.ry0000tarodojo2026.ui.viewmodel.MainViewModel
 import com.example.ry0000tarodojo2026.BuildConfig
+import com.example.ry0000tarodojo2026.data.model.VideoData
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,34 +68,42 @@ class MainActivity : ComponentActivity() {
 }
 
 
-
 @Composable
 fun HomeScreen(viewModel: MainViewModel) {
-    // ① ここを videoList に書き換える（型を合わせるため）
+
+    // ① videoIds ではなく videoList を監視するように修正
+    // (MainViewModel.kt で変えた名前に合わせます)
     val videoList by viewModel.videoList.collectAsStateWithLifecycle()
 
-    Button(
-        onClick = {
-            viewModel.searchVideos(
-                apiKey = BuildConfig.YOUTUBE_API_KEY,
-                query = "3分 フィットネス",
-                limitSeconds = 180
-            )
-        },
-        modifier = Modifier.fillMaxWidth().padding(16.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
     ) {
-        Text("YouTubeで動画を検索する")
-    }
+        Button(
+            onClick = {
+                // 引数名を limitSeconds に一次的に変更
+                viewModel.searchVideos(
+                    apiKey = BuildConfig.YOUTUBE_API_KEY,
+                    query = "3分 フィットネス",
+                    limitSeconds = 180
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text("YouTubeで動画を検索する")
+        }
 
-    // ② リスト表示部分をいったんコメントアウトするか、videoList を使うように変える
-    LazyColumn {
-        items(videoList) { video ->
-            // ここは空でも、Text("test") だけでもOK！
-            // 大事なのは「エラーを消してアプリを動かすこと」です
-            Text(text = "取得中...", modifier = Modifier.padding(16.dp))
+        LazyColumn(modifier = Modifier.weight(1f)) {
+            items(videoList) { video ->
+                VideoRow(videoData = video)
+            }
         }
     }
 }
+/*
 /*
     // ① ViewModel の StateFlow を Compose 用の状態に変換
 // ① videoIds ではなく videoList を受け取るように修正
@@ -192,6 +201,7 @@ val dummyVideoList = listOf(
     VideoData(7, "thumbnail_7", "G", "7-G"),
 )
 
+*/
 
 @Composable
 fun VideoRow(videoData: VideoData) {
