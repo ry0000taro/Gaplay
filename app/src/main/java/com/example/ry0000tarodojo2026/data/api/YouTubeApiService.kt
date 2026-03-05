@@ -36,7 +36,7 @@ interface YouTubeApiService {
 
     @GET("videos")
     suspend fun getVideoDetails(
-        @Query("part") part: String = "contentDetails,snippet",
+        @Query("part") part: String = "contentDetails,snippet,statistics",
         @Query("id") id: String, // カンマ区切りで複数ID指定可能
         @Query("key") apiKey: String
     ): VideoDetailsResponse
