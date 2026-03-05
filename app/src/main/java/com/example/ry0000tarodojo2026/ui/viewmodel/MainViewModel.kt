@@ -2,6 +2,7 @@ package com.example.ry0000tarodojo2026.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ry0000tarodojo2026.data.local.SearchPrefs
 import com.example.ry0000tarodojo2026.data.model.VideoData
 import com.example.ry0000tarodojo2026.data.repository.YouTubeRepository
 import com.example.ry0000tarodojo2026.data.model.VideoEntity
@@ -15,7 +16,10 @@ import kotlinx.coroutines.launch
 /**
  * 画面のデータを管理する監督役（ViewModel）
  */
-class MainViewModel(private val repository: YouTubeRepository) : ViewModel() {
+class MainViewModel(
+    private val repository: YouTubeRepository,
+    private val searchPrefs: SearchPrefs
+) : ViewModel() {
 
     val videoList: StateFlow<List<VideoEntity>> = repository.allVideos
         .stateIn(
@@ -23,6 +27,14 @@ class MainViewModel(private val repository: YouTubeRepository) : ViewModel() {
             started = SharingStarted.WhileSubscribed(5000), // アプリが閉じられて5秒後に停止
             initialValue = emptyList()
         )
+
+    // ★2. 前回の検索ワードをStateFlowに変換
+    val lastSearchQuery: StateFlow<String> = searchPrefs.lastQuery
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "カップ麺")
+
+    // ★3. 前回の分数をStateFlowに変換
+    val lastDurationMinutes: StateFlow<String> = searchPrefs.lastMinutes
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "3")
 
     // ✅ 2. 読み込み中かどうかを管理するフラグ（これがないとエラー！）
     private val _isLoading = MutableStateFlow(false)
@@ -34,6 +46,7 @@ class MainViewModel(private val repository: YouTubeRepository) : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true // 通信開始！
             try {
+                searchPrefs.saveSearchConditions(query, limitSeconds.toString())
                 // ✅ 【変更】戻り値を受け取らず、DBの更新（リフレッシュ）だけを依頼する
                 // これだけで、上の videoList (Flow) が自動的に最新データに切り替わります
                 repository.refreshVideosWithinDuration(apiKey, query, limitSeconds)

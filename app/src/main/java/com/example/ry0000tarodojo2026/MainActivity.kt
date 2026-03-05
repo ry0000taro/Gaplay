@@ -25,6 +25,7 @@ import androidx.room.Room
 import coil.compose.AsyncImage
 import com.example.ry0000tarodojo2026.data.api.RetrofitInstance
 import com.example.ry0000tarodojo2026.data.local.AppDatabase
+import com.example.ry0000tarodojo2026.data.local.SearchPrefs
 import com.example.ry0000tarodojo2026.data.model.VideoEntity
 import com.example.ry0000tarodojo2026.data.repository.YouTubeRepository
 import com.example.ry0000tarodojo2026.ui.viewmodel.MainViewModel
@@ -39,17 +40,22 @@ class MainActivity : ComponentActivity() {
             AppDatabase::class.java, "youtube-db"
         ).build()
 
+        val searchPrefs = SearchPrefs(applicationContext)
+
         val repository = YouTubeRepository(
             apiService = RetrofitInstance.api,
             dao = db.videoDao()
         )
 
-        val viewModel = MainViewModel(repository)
+        val viewModel = MainViewModel(repository, searchPrefs)
 
         setContent {
             // 2. ViewModelの状態をComposeで監視できるように変換
             val videoList by viewModel.videoList.collectAsStateWithLifecycle()
             val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+
+            val savedQuery by viewModel.lastSearchQuery.collectAsStateWithLifecycle()
+            val savedMinutes by viewModel.lastDurationMinutes.collectAsStateWithLifecycle()
 
             MaterialTheme {
                 Surface(
@@ -60,9 +66,10 @@ class MainActivity : ComponentActivity() {
                     MainScreen(
                         videoList = videoList,
                         isLoading = isLoading,
-                        onSearchClick = { query, seconds ->
-                            // 検索実行時にViewModelの関数を呼ぶ
-                            viewModel.searchVideos(BuildConfig.YOUTUBE_API_KEY, query, seconds)
+                        initialQuery = savedQuery,
+                        initialMinutes = savedMinutes,
+                        onSearchClick = { query, minutes ->
+                            viewModel.searchVideos(BuildConfig.YOUTUBE_API_KEY, query, minutes)
                         }
                     )
                 }
@@ -75,11 +82,17 @@ class MainActivity : ComponentActivity() {
 fun MainScreen(
     videoList: List<VideoEntity>,
     isLoading: Boolean,
+    initialQuery: String,
+    initialMinutes: String,
     onSearchClick: (String, Long) -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("K-POP") }
     var durationMinutes by remember { mutableStateOf("3") }
-
+// ★ 重要：DataStoreから値が届いたら、入力欄の文字を更新する
+    LaunchedEffect(initialQuery, initialMinutes) {
+        searchQuery = initialQuery
+        durationMinutes = initialMinutes
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -253,7 +266,7 @@ fun VideoItemRow(video: VideoEntity) {
                     modifier = Modifier.fillMaxWidth().height(48.dp),
                     shape = CircleShape
                 ) {
-                    Text("調理開始（動画を再生）", fontWeight = FontWeight.Bold)
+                    Text("動画を再生・タイマー開始", fontWeight = FontWeight.Bold)
                 }
             }
         }
