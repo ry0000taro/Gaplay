@@ -39,10 +39,13 @@ class YouTubeRepository(private val apiService: YouTubeApiService) {
 
             filteredList.map { item ->
                 VideoData(
-                    id = 0,
+                    id = item.id,
                     thumbnailUrl = item.snippet.thumbnails.high.url,
                     videoTitle = item.snippet.title,
-                    channelName = "YouTube Channel"
+                    channelName = item.snippet.channelTitle,
+                    viewCount = formatViewCount(item.statistics.viewCount), // 視聴回数を整形して追加
+                    duration = formatDurationString(item.contentDetails.duration) ,// "3:15" 形式に変換
+                    channelId = item.snippet.channelId
                 )
             }
 
