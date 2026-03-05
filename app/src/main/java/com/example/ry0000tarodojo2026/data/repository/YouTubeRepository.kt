@@ -77,6 +77,29 @@ class YouTubeRepository(private val apiService: YouTubeApiService) {
             emptyList()
         }
     }
+
+    /**
+     * 視聴回数を「〇〇万 views」形式に整形する
+     */
+    private fun formatViewCount(countStr: String?): String {
+        val count = countStr?.toLongOrNull() ?: return "0 views"
+        return when {
+            count >= 100_000_000 -> "${count / 100_000_000}億 views"
+            count >= 10_000 -> "${count / 10_000}万 views"
+            count >= 1_000 -> "${count / 1_000}K views"
+            else -> "$count views"
+        }
+    }
+
+    /**
+     * ISO再生時間を "0:00" 形式の文字列に変換する
+     */
+    private fun formatDurationString(isoDuration: String): String {
+        val duration = Duration.parse(isoDuration)
+        val minutes = duration.toMinutes()
+        val seconds = duration.minusMinutes(minutes).seconds
+        return "%d:%02d".format(minutes, seconds)
+    }
 }
 
 
