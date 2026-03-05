@@ -3,14 +3,9 @@ package com.example.ry0000tarodojo2026.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ry0000tarodojo2026.data.local.SearchPrefs
-import com.example.ry0000tarodojo2026.data.model.VideoData
-import com.example.ry0000tarodojo2026.data.repository.YouTubeRepository
 import com.example.ry0000tarodojo2026.data.model.VideoEntity
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
+import com.example.ry0000tarodojo2026.data.repository.YouTubeRepository
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 /**
@@ -21,44 +16,67 @@ class MainViewModel(
     private val searchPrefs: SearchPrefs
 ) : ViewModel() {
 
-    val videoList: StateFlow<List<VideoEntity>> = repository.allVideos
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000), // アプリが閉じられて5秒後に停止
-            initialValue = emptyList()
-        )
+    // タイマーの専門家を用意（工程1で作成予定）
+    private val timerManager = TimerManager(viewModelScope)
 
-    // ★2. 前回の検索ワードをStateFlowに変換
-    val lastSearchQuery: StateFlow<String> = searchPrefs.lastQuery
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "カップ麺")
+    // 全ての情報を一つの StateFlow で管理（工程2で作成）
+    private val _uiState = MutableStateFlow(MainUiState())
+    val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
-    // ★3. 前回の分数をStateFlowに変換
-    val lastDurationMinutes: StateFlow<String> = searchPrefs.lastMinutes
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "3")
+    init {
+        // 各データソースを統合して UI 状態を自動更新する
+        combine(
+            repository.allVideos,
+            searchPrefs.lastQuery,
+            searchPrefs.lastMinutes,
+            timerManager.remainingSeconds
+        ) { videos, query, mins, seconds ->
+            _uiState.update { it.copy(
+                videoList = videos,
+                lastQuery = query,
+                lastMinutes = mins,
+                remainingSeconds = seconds
+            ) }
+        }.launchIn(viewModelScope)
+    }
 
-    // ✅ 2. 読み込み中かどうかを管理するフラグ（これがないとエラー！）
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
-    /**
-     * 動画を検索してIDリストを更新する
-     */
-    fun searchVideos(apiKey: String, query: String, limitSeconds: Long = 180) {
+    fun searchVideos(apiKey: String, query: String, limitSeconds: Long) {
         viewModelScope.launch {
-            _isLoading.value = true // 通信開始！
-            try {
-                searchPrefs.saveSearchConditions(query, limitSeconds.toString())
-                // ✅ 【変更】戻り値を受け取らず、DBの更新（リフレッシュ）だけを依頼する
-                // これだけで、上の videoList (Flow) が自動的に最新データに切り替わります
-                repository.refreshVideosWithinDuration(apiKey, query, limitSeconds)
+            _uiState.update { it.copy(isLoading = true) }
+            // 秒数を「分」の文字列に戻して保存（SearchPrefsがStringを期待しているため）
+            val minutesString = (limitSeconds / 60).toString()
+            searchPrefs.saveSearchConditions(query, minutesString)
 
-                android.util.Log.d("RoomCheck", "保存件数: ${videoList.value.size} 件")
-            } catch (e: Exception) {
-                android.util.Log.e("MainViewModel", "検索または保存に失敗しました（オフラインの可能性があります", e)
+            // 検索実行（すでに秒数になっているのでそのまま渡す）
+            repository.refreshVideosWithinDuration(apiKey, query, limitSeconds)
 
-            } finally {
-                _isLoading.value = false
-            }
+            _uiState.update { it.copy(isLoading = false) }
         }
-        }
+    }
 
+    fun onVideoSelect(video: VideoEntity) {
+        _uiState.update { it.copy(selectedVideo = video) }
+        val totalSeconds = parseDurationToSeconds(video.id, video.duration)
+        timerManager.start(totalSeconds) // 専門家に依頼！
+    }
+
+    fun onBackToList() {
+        _uiState.update { it.copy(selectedVideo = null) }
+        timerManager.stop()
+    }
+
+    /**
+     * "M:SS" 形式の文字列を秒数(Long)に変換するヘルパー関数
+     */
+    private fun parseDurationToSeconds(id: String, duration: String?): Long {
+        if (duration == null) return 180L
+        return try {
+            val parts = duration.split(":")
+            val minutes = parts[0].toLong()
+            val seconds = parts[1].toLong()
+            (minutes * 60) + seconds
+        } catch (e: Exception) {
+            180L
+        }
+    }
 }
