@@ -48,6 +48,8 @@ import com.example.ry0000tarodojo2026.data.repository.YouTubeRepository
 import com.example.ry0000tarodojo2026.ui.viewmodel.MainViewModel
 import com.example.ry0000tarodojo2026.BuildConfig
 import com.example.ry0000tarodojo2026.data.model.VideoData
+import coil.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -222,7 +224,12 @@ fun VideoRow(videoData: VideoData) {
                 .background(Color.LightGray),
             contentAlignment = Alignment.BottomEnd
         ) {
-            Text("Thumbnail Image", color = Color.Gray)
+            AsyncImage(
+                model = videoData.thumbnailUrl, //
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
 
             // 再生時間
             Surface(
@@ -231,7 +238,7 @@ fun VideoRow(videoData: VideoData) {
                 modifier = Modifier.padding(8.dp)
             ) {
                 Text(
-                    text = "15:00",
+                    text = videoData.duration,
                     color = Color.White,
                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
                     fontSize = 12.sp
@@ -266,7 +273,7 @@ fun VideoRow(videoData: VideoData) {
                     lineHeight = 22.sp
                 )
                 Text(
-                    text = "${videoData.channelName} • 840K views",
+                    text = "${videoData.channelName} • \${videoData.viewCount}",
                     color = Color.Gray,
                     fontSize = 14.sp,
                     modifier = Modifier.padding(top = 4.dp)
