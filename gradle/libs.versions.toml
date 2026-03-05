@@ -15,6 +15,7 @@ coil = "2.6.0"
 room = "2.7.0-alpha11"
 ksp = "2.0.21-1.0.28"
 datastore = "1.1.1"
+youtube-player = "12.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -39,6 +40,8 @@ androidx-room-compiler = { group = "androidx.room", name = "room-compiler", vers
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "converter-gson" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+youtube-player-compose = { group = "com.pierfrancescosoffritti.androidyoutubeplayer", name = "compose", version.ref = "youtube-player" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
