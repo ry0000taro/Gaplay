@@ -4,7 +4,7 @@ package com.example.ry0000tarodojo2026.data.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "youtube_videos")
+@Entity(tableName = "videos")
 data class VideoEntity(
     @PrimaryKey val id: String, // 動画ID
     val title: String,
