@@ -1,10 +1,55 @@
 package com.example.ry0000tarodojo2026.data.repository
 
 import com.example.ry0000tarodojo2026.data.api.YouTubeApiService
-import com.example.ry0000tarodojo2026.data.model.VideoData
 import java.time.Duration
 import android.util.Log
-class YouTubeRepository(private val apiService: YouTubeApiService) {
+import com.example.ry0000tarodojo2026.data.local.VideoDao
+import com.example.ry0000tarodojo2026.data.model.VideoData
+import com.example.ry0000tarodojo2026.data.model.VideoEntity
+import kotlinx.coroutines.flow.Flow
+
+class YouTubeRepository(
+    private val apiService: YouTubeApiService,
+    private val dao: VideoDao
+
+) {
+    val allVideos: Flow<List<VideoEntity>> = dao.getAllVideos()
+    suspend fun refreshVideosWithinDuration(
+        apiKey: String,
+        query: String,
+        maxDurationSeconds: Long
+    ) {
+        try {
+            // 3. 既存の取得ロジック（getVideosWithinDurationの中身）を再利用
+            val searchResponse = apiService.getVideoList(apiKey, query, "short")
+            val videoIds = searchResponse.items.map { it.id.videoId }.joinToString(",")
+            if (videoIds.isEmpty()) return
+
+            val detailsResponse = apiService.getVideoDetails(id = videoIds, apiKey = apiKey)
+
+            // 4. 【書き換え】フィルタリングしつつ、直接 VideoEntity に変換してリストを作る
+            val entities = detailsResponse.items.filter { item ->
+                parseDurationToSeconds(item.contentDetails.duration) <= maxDurationSeconds
+            }.map { item ->
+                VideoEntity(
+                    id = item.id,
+                    title = item.snippet.title,
+                    thumbnailUrl = item.snippet.thumbnails.high.url,
+                    channelTitle = item.snippet.channelTitle,
+                    duration = formatDurationString(item.contentDetails.duration),
+                    savedAt = System.currentTimeMillis()
+                )
+            }
+
+            // 5. 【重要】DBを更新。ここを実行した瞬間にUI（Flow）へ通知が行く
+            dao.clearAll()
+            dao.insertVideos(entities)
+
+        } catch (e: Exception) {
+            Log.e("YouTubeRepository", "Refresh Error", e)
+        }
+    }
+
 
     /**
      * 指定したキーワードで検索し、指定秒数以内の動画だけを返す
@@ -100,6 +145,11 @@ class YouTubeRepository(private val apiService: YouTubeApiService) {
         val seconds = duration.minusMinutes(minutes).seconds
         return "%d:%02d".format(minutes, seconds)
     }
+
+
+
+
+
 }
 
 
