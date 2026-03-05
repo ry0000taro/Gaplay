@@ -2,11 +2,14 @@ package com.example.ry0000tarodojo2026.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ry0000tarodojo2026.data.repository.YouTubeRepository
 import com.example.ry0000tarodojo2026.data.model.VideoData
+import com.example.ry0000tarodojo2026.data.repository.YouTubeRepository
+import com.example.ry0000tarodojo2026.data.model.VideoEntity
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /**
@@ -14,9 +17,12 @@ import kotlinx.coroutines.launch
  */
 class MainViewModel(private val repository: YouTubeRepository) : ViewModel() {
 
-    // ✅ 1. UIに渡す「完成した動画リスト」を保持する箱
-    private val _videoList = MutableStateFlow<List<VideoData>>(emptyList())
-    val videoList: StateFlow<List<VideoData>> = _videoList.asStateFlow()
+    val videoList: StateFlow<List<VideoEntity>> = repository.allVideos
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000), // アプリが閉じられて5秒後に停止
+            initialValue = emptyList()
+        )
 
     // ✅ 2. 読み込み中かどうかを管理するフラグ（これがないとエラー！）
     private val _isLoading = MutableStateFlow(false)
@@ -28,11 +34,16 @@ class MainViewModel(private val repository: YouTubeRepository) : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true // 通信開始！
             try {
-                // 3. IDだけでなく、時間選別された完成品を受け取る
-                val result = repository.getVideosWithinDuration(apiKey, query, limitSeconds)
-                _videoList.value = result
+                // ✅ 【変更】戻り値を受け取らず、DBの更新（リフレッシュ）だけを依頼する
+                // これだけで、上の videoList (Flow) が自動的に最新データに切り替わります
+                repository.refreshVideosWithinDuration(apiKey, query, limitSeconds)
+
+                android.util.Log.d("RoomCheck", "保存件数: ${videoList.value.size} 件")
+            } catch (e: Exception) {
+                android.util.Log.e("MainViewModel", "検索または保存に失敗しました（オフラインの可能性があります", e)
+
             } finally {
-                _isLoading.value = false // 通信終了（成功でも失敗でも）
+                _isLoading.value = false
             }
         }
         }
