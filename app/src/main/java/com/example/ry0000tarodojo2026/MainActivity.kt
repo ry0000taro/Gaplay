@@ -3,16 +3,9 @@ package com.example.ry0000tarodojo2026
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -21,20 +14,24 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import coil.compose.AsyncImage
 import com.example.ry0000tarodojo2026.data.api.RetrofitInstance
 import com.example.ry0000tarodojo2026.data.local.AppDatabase
 import com.example.ry0000tarodojo2026.data.local.SearchPrefs
-import com.example.ry0000tarodojo2026.data.model.VideoEntity
 import com.example.ry0000tarodojo2026.data.repository.YouTubeRepository
 import com.example.ry0000tarodojo2026.ui.viewmodel.MainViewModel
-
+import com.example.ry0000tarodojo2026.ui.components.SearchHeaderCard
+import com.example.ry0000tarodojo2026.ui.screens.SearchListScreen
+import com.example.ry0000tarodojo2026.ui.screens.TimerPlayerScreen
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // 1. データベース・リポジトリ・ViewModelを準備
+        // 1. 各種インスタンスの初期化
         val db = Room.databaseBuilder(
             applicationContext,
             AppDatabase::class.java, "youtube-db"
@@ -50,33 +47,34 @@ class MainActivity : ComponentActivity() {
         val viewModel = MainViewModel(repository, searchPrefs)
 
         setContent {
-            // 2. ViewModelの状態をComposeで監視できるように変換
+            // ナビゲーションの司令塔
+            val navController = rememberNavController()
+
+            // ViewModel からの状態を監視
             val videoList by viewModel.videoList.collectAsStateWithLifecycle()
             val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
-
             val savedQuery by viewModel.lastSearchQuery.collectAsStateWithLifecycle()
             val savedMinutes by viewModel.lastDurationMinutes.collectAsStateWithLifecycle()
+            val selectedVideo by viewModel.selectedVideo.collectAsStateWithLifecycle()
+            val remainingSeconds by viewModel.remainingSeconds.collectAsStateWithLifecycle()
 
             MaterialTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    // ★ ここが重要！ 作成したMainScreenをここで呼び出します
-                    MainScreen(
-                        videoList = videoList,
-                        isLoading = isLoading,
-                        initialQuery = savedQuery,
-                        initialMinutes = savedMinutes,
-                        onSearchClick = { query, minutes ->
-                            viewModel.searchVideos(BuildConfig.YOUTUBE_API_KEY, query, minutes)
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
+                    // 全体のレイアウト構成
+                    Column(modifier = Modifier.fillMaxSize()) {
+
+                        // --- A. 固定表示される検索バー（ui/components配下） ---
+                        SearchHeaderCard(
+                            initialQuery = savedQuery,
+                            initialMinutes = savedMinutes,
+                            isLoading = isLoading,
+                            onSearch = { query, seconds ->
+                                viewModel.searchVideos(BuildConfig.YOUTUBE_API_KEY, query, seconds.toString())
+                            }
+                        )
 
 @Composable
 fun MainScreen(
@@ -169,72 +167,18 @@ fun MainScreen(
             }
         }
 
-        // --- 2. 動画リストエリア（LazyColumn） ---
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(bottom = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            items(videoList) { video ->
-                VideoItemRow(video = video)
-            }
-        }
-    }
-}
-
-@Composable
-fun VideoItemRow(video: VideoEntity) {
-    ElevatedCard(
-        modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .fillMaxWidth(),
-        shape = MaterialTheme.shapes.extraLarge,
-        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
-        Column {
-            Box(modifier = Modifier.height(200.dp).fillMaxWidth()) {
-                AsyncImage(
-                    model = video.thumbnailUrl,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-                Surface(
-                    color = Color.Black.copy(alpha = 0.7f),
-                    shape = MaterialTheme.shapes.small,
-                    modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp)
-                ) {
-                    Text(
-                        text = video.duration ?: "0:00",
-                        color = Color.White,
-                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                        style = MaterialTheme.typography.labelSmall
-                    )
-                }
-            }
-
-            Column(modifier = Modifier.padding(16.dp)) {
-                Row(verticalAlignment = Alignment.Top) {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = null,
-                        modifier = Modifier.size(40.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Text(
-                            text = video.title,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Text(
-                            text = video.channelTitle,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                            // 【画面2】タイマー ＋ 動画再生画面
+                            composable(Routes.TIMER_PLAYER) {
+                                TimerPlayerScreen(
+                                    video = selectedVideo,
+                                    remainingSeconds = remainingSeconds,
+                                    onBack = {
+                                        viewModel.onBackToList() // タイマー停止などの後処理
+                                        navController.popBackStack() // リスト画面に戻る
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
 
