@@ -146,7 +146,9 @@ class YouTubeRepository(
         return "%d:%02d".format(minutes, seconds)
     }
 
-
+    fun getVideoById(videoId: String): Flow<VideoEntity?> {
+        return dao.getVideoById(videoId)
+    }
 
 
 
