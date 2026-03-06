@@ -41,7 +41,7 @@ androidx-room-compiler = { group = "androidx.room", name = "room-compiler", vers
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "converter-gson" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
-youtube-player-compose = { group = "com.pierfrancescosoffritti.androidyoutubeplayer", name = "compose", version.ref = "youtube-player" }
+youtube-player-compose = { group = "com.pierfrancescosoffritti.androidyoutubeplayer", name = "core", version.ref = "youtube-player" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose" }
 
 [plugins]

@@ -8,6 +8,7 @@ pluginManagement {
             }
         }
         mavenCentral()
+        maven { url = uri("https://jitpack.io") }
         gradlePluginPortal()
     }
 }
@@ -24,4 +25,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "ry0000taro.dojo2026"
 include(":app")
- 
