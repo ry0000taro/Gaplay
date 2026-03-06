@@ -4,7 +4,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class TimerManager(private val scope: CoroutineScope) {
+// クラス名を衝突しない名前に変更 ★
+class ExerciseTimerManager(private val scope: CoroutineScope) {
     private val _remainingSeconds = MutableStateFlow(0L)
     val remainingSeconds = _remainingSeconds.asStateFlow()
 
@@ -12,7 +13,7 @@ class TimerManager(private val scope: CoroutineScope) {
 
     fun start(initialSeconds: Long) {
         _remainingSeconds.value = initialSeconds
-        timerJob?.cancel() // 二重起動防止
+        timerJob?.cancel()
         timerJob = scope.launch {
             while (_remainingSeconds.value > 0) {
                 delay(1000)

@@ -17,7 +17,7 @@ class MainViewModel(
 ) : ViewModel() {
 
     // タイマーの専門家を用意（工程1で作成予定）
-    private val timerManager = TimerManager(viewModelScope)
+    private val timerManager = ExerciseTimerManager(viewModelScope)
 
     // 全ての情報を一つの StateFlow で管理（工程2で作成）
     private val _uiState = MutableStateFlow(MainUiState())

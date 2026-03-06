@@ -66,6 +66,7 @@ class MainActivity : ComponentActivity() {
                             composable(Routes.SEARCH_LIST) {
                                 SearchListScreen(
                                     videoList = videoList,
+                                    targetMinutes = savedMinutes,
                                     onVideoSelect = { video ->
                                         // --- ★ 修正2: 計算ロジックを動かす ---
                                         viewModel.onVideoSelect(video)

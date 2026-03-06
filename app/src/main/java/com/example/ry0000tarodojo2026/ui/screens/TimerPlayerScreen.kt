@@ -5,9 +5,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.ry0000tarodojo2026.data.model.VideoEntity
@@ -19,62 +16,65 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTube
 fun TimerPlayerScreen(
     video: VideoEntity?,
     remainingSeconds: Long,
-    exerciseSeconds: Long, // ★ 追加：計算された運動時間
+    exerciseSeconds: Long,
+    onPlay: () -> Unit = {},
+    onPause: () -> Unit = {},
     onBack: () -> Unit
 ) {
     if (video == null) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("動画が選択されていません")
+            Text("動画を準備中...")
         }
         return
     }
 
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val videoIdOnly = remember(video.id) {
+        video.id.trim().split("v=").last().split("&").first().split("/").last()
+    }
 
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-        // YouTubeプレイヤー表示エリア
-        AndroidView(
-            factory = { context ->
-                YouTubePlayerView(context).apply {
-                    lifecycleOwner.lifecycle.addObserver(this)
-                    addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
-                        override fun onReady(youTubePlayer: YouTubePlayer) {
-                            youTubePlayer.loadVideo(video.id, 0f)
-                        }
-                    })
-                }
-            },
+        // YouTubePlayerViewをAndroidViewでラップしてCompose内で使用
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(16 / 9f)
-                .padding(16.dp)
-        )
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            AndroidView(
+                modifier = Modifier.fillMaxSize(),
+                factory = { context ->
+                    YouTubePlayerView(context).apply {
+                        addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+                            override fun onReady(youTubePlayer: YouTubePlayer) {
+                                youTubePlayer.cueVideo(videoIdOnly, 0f)
+                                onPlay()
+                            }
+                        })
+                    }
+                },
+                update = { view ->
+                    // 必要に応じて更新処理を記述
+                }
+            )
+        }
 
-        // カウントダウン表示
         Text(
             text = String.format("%02d:%02d", remainingSeconds / 60, remainingSeconds % 60),
             style = MaterialTheme.typography.displayLarge,
-            fontWeight = FontWeight.Bold,
-            color = if (remainingSeconds <= 10) Color.Red else MaterialTheme.colorScheme.primary
+            color = if (remainingSeconds <= 10) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
         )
 
-        // --- ★ ここにエクササイズメッセージを追加！ ---
         if (exerciseSeconds > 0) {
-            val exMin = exerciseSeconds / 60
-            val exSec = exerciseSeconds % 60
-
             Spacer(modifier = Modifier.height(16.dp))
-
-            Surface(
-                color = MaterialTheme.colorScheme.tertiaryContainer,
-                shape = MaterialTheme.shapes.medium,
+            Card(
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
                 modifier = Modifier.padding(horizontal = 24.dp)
             ) {
                 Text(
-                    text = "動画のあとに ${exMin}分${exSec}秒 の運動をしましょう！",
+                    text = "動画のあとに ${exerciseSeconds / 60}分${exerciseSeconds % 60}秒 の運動をしましょう！",
                     modifier = Modifier.padding(16.dp),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer
+                    style = MaterialTheme.typography.bodyLarge
                 )
             }
         }
