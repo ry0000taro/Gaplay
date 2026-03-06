@@ -55,11 +55,20 @@ class MainViewModel(
     }
 
     fun onVideoSelect(video: VideoEntity) {
-        _uiState.update { it.copy(selectedVideo = video) }
-        val totalSeconds = parseDurationToSeconds(video.id, video.duration)
-        timerManager.start(totalSeconds) // 専門家に依頼！
+        // 1. 動画の長さを秒に変換
+        val videoSeconds = parseDurationToSeconds(video.id, video.duration)
+        // 2. ユーザーが設定した目標時間を秒に変換 (uiStateから現在の値を取得)
+        val targetSeconds = (_uiState.value.lastMinutes.toLongOrNull() ?: 3L) * 60
+        // 3. 差分（エクササイズ時間）を計算
+        val exerciseSec = (targetSeconds - videoSeconds).coerceAtLeast(0L)
+        // 4. UiState を一気に更新！
+        _uiState.update { it.copy(
+            selectedVideo = video,
+            exerciseSeconds = exerciseSec // ★ここを忘れずに追加！
+        ) }
+        // 5. タイマー開始（動画の長さ分カウントダウン）
+        timerManager.start(videoSeconds)
     }
-
     fun onBackToList() {
         _uiState.update { it.copy(selectedVideo = null) }
         timerManager.stop()
