@@ -15,6 +15,9 @@ interface VideoDao {
     @Query("SELECT * FROM videos ORDER BY savedAt DESC")
     fun getAllVideos(): Flow<List<VideoEntity>>
 
+    // IDで1件取得
+    @Query("SELECT * FROM videos WHERE id = :id")
+    fun getVideoById(id: String): Flow<VideoEntity?>
     // リストをまるごと保存する（IDが重複していたら上書き）
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertVideos(videos: List<VideoEntity>)
