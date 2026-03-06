@@ -7,6 +7,7 @@ data class MainUiState(
     val isLoading: Boolean = false,
     val selectedVideo: VideoEntity? = null,
     val remainingSeconds: Long = 0,
-    val lastQuery: String = "カップ麺",
-    val lastMinutes: String = "3"
+    val lastQuery: String = "K-POP",
+    val lastMinutes: String = "3",
+    val exerciseSeconds: Long = 0
 )
