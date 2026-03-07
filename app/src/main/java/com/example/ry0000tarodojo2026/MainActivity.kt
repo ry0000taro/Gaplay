@@ -23,6 +23,7 @@ import com.example.ry0000tarodojo2026.ui.viewmodel.TimerViewModelFactory
 import com.example.ry0000tarodojo2026.ui.components.SearchHeaderCard
 import com.example.ry0000tarodojo2026.ui.screens.SearchListScreen
 import com.example.ry0000tarodojo2026.ui.screens.TimerPlayerScreen
+import com.example.ry0000tarodojo2026.ui.theme.Ry0000tarodojo2026Theme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,8 +50,9 @@ class MainActivity : ComponentActivity() {
             val savedMinutes = uiState.lastMinutes
             val remainingSeconds = uiState.remainingSeconds
             val exerciseSeconds = uiState.exerciseSeconds
+            val isExercisePhase = uiState.isExercisePhase
 
-            MaterialTheme {
+            Ry0000tarodojo2026Theme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     Column(modifier = Modifier.fillMaxSize()) {
                         SearchHeaderCard(
@@ -84,6 +86,7 @@ class MainActivity : ComponentActivity() {
                                     remainingSeconds = remainingSeconds,
                                     // --- ★ 修正3: 計算済みの運動時間を画面に渡す ---
                                     exerciseSeconds = exerciseSeconds,
+                                    isExercisePhase = isExercisePhase,
                                     onBack = {
                                         viewModel.onBackToList()
                                         navController.popBackStack()
