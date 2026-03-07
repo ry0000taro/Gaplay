@@ -29,13 +29,15 @@ class MainViewModel(
             repository.allVideos,
             searchPrefs.lastQuery,
             searchPrefs.lastMinutes,
-            timerManager.remainingSeconds
-        ) { videos, query, mins, seconds ->
+            timerManager.remainingSeconds,
+            timerManager.isExercisePhase
+        ) { videos, query, mins, seconds, isExercise ->
             _uiState.update { it.copy(
                 videoList = videos,
                 lastQuery = query,
                 lastMinutes = mins,
-                remainingSeconds = seconds
+                remainingSeconds = seconds,
+                isExercisePhase = isExercise
             ) }
         }.launchIn(viewModelScope)
     }
@@ -66,8 +68,7 @@ class MainViewModel(
             selectedVideo = video,
             exerciseSeconds = exerciseSec // ★ここを忘れずに追加！
         ) }
-        // 5. タイマー開始（動画の長さ分カウントダウン）
-        timerManager.start(videoSeconds)
+        timerManager.start(videoSeconds, exerciseSec)
     }
     fun onBackToList() {
         _uiState.update { it.copy(selectedVideo = null) }
