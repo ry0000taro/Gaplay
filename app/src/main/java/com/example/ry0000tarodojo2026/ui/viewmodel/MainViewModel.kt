@@ -75,7 +75,7 @@ class MainViewModel(
         timerManager.stop()
     }
 
-    /**
+    /**git remote -v
      * "M:SS" 形式の文字列を秒数(Long)に変換するヘルパー関数
      */
     private fun parseDurationToSeconds(id: String, duration: String?): Long {
