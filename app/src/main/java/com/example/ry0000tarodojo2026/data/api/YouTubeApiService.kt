@@ -12,7 +12,7 @@ import retrofit2.http.Query
 interface YouTubeApiService {
 
     // YouTubeの検索エンドポイントを指定
-    @GET("youtube/v3/search")
+    @GET("search")
     suspend fun getVideoList(
         // APIキー（Google Cloud Consoleで取得したもの）
         @Query("key") apiKey: String,
@@ -34,9 +34,9 @@ interface YouTubeApiService {
     ): YouTubeSearchResponse
 
 
-    @GET("youtube/v3/videos")
+    @GET("videos")
     suspend fun getVideoDetails(
-        @Query("part") part: String = "contentDetails,snippet",
+        @Query("part") part: String = "contentDetails,snippet,statistics",
         @Query("id") id: String, // カンマ区切りで複数ID指定可能
         @Query("key") apiKey: String
     ): VideoDetailsResponse
