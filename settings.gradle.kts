@@ -24,5 +24,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ry0000taro.dojo2026"
+rootProject.name = "Gaplay"
 include(":app")

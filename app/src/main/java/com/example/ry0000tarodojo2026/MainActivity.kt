@@ -43,7 +43,6 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-            // --- ★ 修正1: exerciseSeconds を取り出す ---
             val videoList = uiState.videoList
             val isLoading = uiState.isLoading
             val savedQuery = uiState.lastQuery
@@ -70,7 +69,6 @@ class MainActivity : ComponentActivity() {
                                     videoList = videoList,
                                     targetMinutes = savedMinutes,
                                     onVideoSelect = { video ->
-                                        // --- ★ 修正2: 計算ロジックを動かす ---
                                         viewModel.onVideoSelect(video)
                                         navController.navigate("timer_player/${video.id}")
                                     }
@@ -84,7 +82,6 @@ class MainActivity : ComponentActivity() {
                                 TimerPlayerScreen(
                                     video = videoEntity,
                                     remainingSeconds = remainingSeconds,
-                                    // --- ★ 修正3: 計算済みの運動時間を画面に渡す ---
                                     exerciseSeconds = exerciseSeconds,
                                     isExercisePhase = isExercisePhase,
                                     onBack = {
