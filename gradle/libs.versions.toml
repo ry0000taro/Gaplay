@@ -15,8 +15,9 @@ coil = "2.6.0"
 room = "2.7.0-alpha11"
 ksp = "2.0.21-1.0.28"
 datastore = "1.1.1"
-youtube-player = "12.1.1"
+youtube-player = "13.0.0"
 navigation-compose = "2.7.7"
+chromecastSender = "0.32"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -43,6 +44,8 @@ converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", ve
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 youtube-player-core = { group = "com.pierfrancescosoffritti.androidyoutubeplayer", name = "core", version.ref = "youtube-player" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation-compose" }
+youtube-player-chromecast = { group = "com.pierfrancescosoffritti.androidyoutubeplayer", name = "chromecast-sender", version.ref = "chromecastSender" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
