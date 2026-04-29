@@ -1,9 +1,5 @@
 package com.example.ry0000tarodojo2026.ui.screens
 
-import android.view.ViewGroup
-import android.webkit.WebChromeClient
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -18,6 +14,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import com.example.ry0000tarodojo2026.data.model.VideoEntity
 import java.util.Locale
 
@@ -29,6 +29,9 @@ fun TimerPlayerScreen(
     isExercisePhase: Boolean,
     onBack: () -> Unit
 ) {
+    // 画面の「寿命（ライフサイクル）」を管理するオブジェクトを取得
+    val lifecycleOwner = LocalLifecycleOwner.current
+
     if (video == null) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
@@ -63,23 +66,24 @@ fun TimerPlayerScreen(
             contentAlignment = Alignment.Center
         ) {
             if (!isExercisePhase) {
-                // アプリ内でWebを開いて再生する仕様（WebView）
-                AndroidView(factory = { context ->
-                    WebView(context).apply {
-                        layoutParams = ViewGroup.LayoutParams(
-                            ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.MATCH_PARENT
-                        )
-                        webViewClient = WebViewClient()
-                        webChromeClient = WebChromeClient() // 動画再生をスムーズにするために追加
-                        settings.javaScriptEnabled = true
-                        settings.domStorageEnabled = true // YouTube再生に推奨
-                        settings.mediaPlaybackRequiresUserGesture = false // 自動再生を許可
-                        
-                        // 埋め込み用URLをロード
-                        loadUrl("https://www.youtube.com/embed/$videoIdOnly?autoplay=1")
-                    }
-                }, modifier = Modifier.fillMaxSize())
+                // --- WebViewからYouTubePlayerViewに変更 ---
+                AndroidView(
+                    factory = { context ->
+                        YouTubePlayerView(context).apply {
+                            // アプリのライフサイクル（停止・再開）とプレーヤーを連動させる
+                            lifecycleOwner.lifecycle.addObserver(this)
+
+                            // プレーヤーの準備ができたら動画をロードする
+                            addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+                                override fun onReady(youTubePlayer: YouTubePlayer) {
+                                    // loadVideoで自動再生を開始
+                                    youTubePlayer.loadVideo(videoIdOnly, 0f)
+                                }
+                            })
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
             } else {
                 // 運動中（WORKOUT）の表示
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -131,15 +135,15 @@ fun TimerPlayerScreen(
         // メッセージカード
         Card(
             colors = CardDefaults.cardColors(
-                containerColor = if (isExercisePhase) MaterialTheme.colorScheme.tertiaryContainer 
-                                 else MaterialTheme.colorScheme.secondaryContainer
+                containerColor = if (isExercisePhase) MaterialTheme.colorScheme.tertiaryContainer
+                else MaterialTheme.colorScheme.secondaryContainer
             ),
             modifier = Modifier.padding(horizontal = 32.dp).fillMaxWidth(),
             shape = RoundedCornerShape(24.dp)
         ) {
             Text(
-                text = if (isExercisePhase) "🔥 最後の追い込みです！" 
-                       else "📺 次は ${exerciseSeconds / 60}分${exerciseSeconds % 60}秒 の運動です",
+                text = if (isExercisePhase) "🔥 最後の追い込みです！"
+                else "📺 次は ${exerciseSeconds / 60}分${exerciseSeconds % 60}秒 の運動です",
                 modifier = Modifier.padding(20.dp),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Medium
