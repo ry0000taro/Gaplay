@@ -78,7 +78,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     ksp(libs.androidx.room.compiler)
     implementation(libs.youtube.player.core)
-    implementation(libs.youtube.player.chromecast)
 }
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     compilerOptions {
