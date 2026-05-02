@@ -50,6 +50,7 @@ class MainActivity : ComponentActivity() {
             val remainingSeconds = uiState.remainingSeconds
             val exerciseSeconds = uiState.exerciseSeconds
             val isExercisePhase = uiState.isExercisePhase
+            val exerciseType = uiState.exerciseType
 
             Ry0000tarodojo2026Theme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
@@ -57,9 +58,10 @@ class MainActivity : ComponentActivity() {
                         SearchHeaderCard(
                             initialQuery = savedQuery,
                             initialMinutes = savedMinutes,
+                            initialExerciseType = exerciseType,
                             isLoading = isLoading,
-                            onSearch = { query, seconds ->
-                                viewModel.searchVideos(BuildConfig.YOUTUBE_API_KEY, query, seconds)
+                            onSearch = { query, seconds, selectedExercise ->
+                                viewModel.searchVideos(BuildConfig.YOUTUBE_API_KEY, query, seconds, selectedExercise)
                             }
                         )
 
@@ -68,6 +70,7 @@ class MainActivity : ComponentActivity() {
                                 SearchListScreen(
                                     videoList = videoList,
                                     targetMinutes = savedMinutes,
+                                    exerciseType = exerciseType,
                                     onVideoSelect = { video ->
                                         viewModel.onVideoSelect(video)
                                         navController.navigate("timer_player/${video.id}")
@@ -84,6 +87,7 @@ class MainActivity : ComponentActivity() {
                                     remainingSeconds = remainingSeconds,
                                     exerciseSeconds = exerciseSeconds,
                                     isExercisePhase = isExercisePhase,
+                                    exerciseType = exerciseType,
                                     onBack = {
                                         viewModel.onBackToList()
                                         navController.popBackStack()

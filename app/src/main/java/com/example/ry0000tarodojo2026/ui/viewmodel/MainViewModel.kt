@@ -25,29 +25,37 @@ class MainViewModel(
 
     init {
         // 各データソースを統合して UI 状態を自動更新する
-        combine(
-            repository.allVideos,
+        val prefsFlow = combine(
             searchPrefs.lastQuery,
             searchPrefs.lastMinutes,
+            searchPrefs.lastExerciseType
+        ) { query, mins, exType ->
+            Triple(query, mins, exType)
+        }
+
+        combine(
+            repository.allVideos,
+            prefsFlow,
             timerManager.remainingSeconds,
             timerManager.isExercisePhase
-        ) { videos, query, mins, seconds, isExercise ->
+        ) { videos, (query, mins, exType), seconds, isExercise ->
             _uiState.update { it.copy(
                 videoList = videos,
                 lastQuery = query,
                 lastMinutes = mins,
+                exerciseType = exType,
                 remainingSeconds = seconds,
                 isExercisePhase = isExercise
             ) }
         }.launchIn(viewModelScope)
     }
 
-    fun searchVideos(apiKey: String, query: String, limitSeconds: Long) {
+    fun searchVideos(apiKey: String, query: String, limitSeconds: Long, exerciseType: String) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             // 秒数を「分」の文字列に戻して保存（SearchPrefsがStringを期待しているため）
             val minutesString = (limitSeconds / 60).toString()
-            searchPrefs.saveSearchConditions(query, minutesString)
+            searchPrefs.saveSearchConditions(query, minutesString, exerciseType)
 
             // 検索実行（すでに秒数になっているのでそのまま渡す）
             repository.refreshVideosWithinDuration(apiKey, query, limitSeconds)
