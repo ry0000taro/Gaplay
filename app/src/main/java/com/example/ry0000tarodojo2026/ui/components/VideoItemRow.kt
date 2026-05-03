@@ -18,7 +18,8 @@ import com.example.ry0000tarodojo2026.data.model.VideoEntity
 @Composable
 fun VideoItemRow(
     video: VideoEntity,
-    exerciseTimeText: String
+    exerciseTimeText: String,
+    exerciseType: String
 ) {
     ElevatedCard(
         modifier = Modifier
@@ -78,6 +79,20 @@ fun VideoItemRow(
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Bold
                             )
+                            if (exerciseType != "選択なし") {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Surface(
+                                    color = MaterialTheme.colorScheme.secondaryContainer,
+                                    shape = MaterialTheme.shapes.small
+                                ) {
+                                    Text(
+                                        text = exerciseType,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                    )
+                                }
+                            }
                         }
                     }
                 }

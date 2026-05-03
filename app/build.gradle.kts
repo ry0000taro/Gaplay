@@ -7,6 +7,12 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+// Set Java toolchain to fix the jlink error by ensuring a full JDK is used instead of a JRE.
+// The foojay resolver in settings.gradle.kts will handle the download if needed.
+kotlin {
+    jvmToolchain(17)
+}
+
 android {
     namespace = "com.example.ry0000tarodojo2026"
     compileSdk = 35

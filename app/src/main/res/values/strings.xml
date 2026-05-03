@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">ry0000taro.dojo2026</string>
+    <string name="error_sensor_not_available">⚠️ 端末にセンサーがないため、この機能は使用できません</string>
 </resources>

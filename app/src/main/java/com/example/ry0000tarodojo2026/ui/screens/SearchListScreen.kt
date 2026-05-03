@@ -16,6 +16,7 @@ import com.example.ry0000tarodojo2026.ui.components.VideoItemRow
 fun SearchListScreen(
     videoList: List<VideoEntity>,
     targetMinutes: String,
+    exerciseType: String,
     onVideoSelect: (VideoEntity) -> Unit
 ) {
     val targetSeconds = (targetMinutes.toLongOrNull() ?: 3L) * 60
@@ -33,7 +34,8 @@ fun SearchListScreen(
             Surface(onClick = { onVideoSelect(video) }, color = Color.Transparent) {
                 VideoItemRow(
                     video = video,
-                    exerciseTimeText = exerciseText
+                    exerciseTimeText = exerciseText,
+                    exerciseType = exerciseType
                 )
             }
         }

@@ -18,7 +18,13 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import android.content.Context
+import android.hardware.SensorManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.example.ry0000tarodojo2026.R
 import com.example.ry0000tarodojo2026.data.model.VideoEntity
+import com.example.ry0000tarodojo2026.utils.ShakeDetector
 import java.util.Locale
 
 @Composable
@@ -27,6 +33,7 @@ fun TimerPlayerScreen(
     remainingSeconds: Long,
     exerciseSeconds: Long,
     isExercisePhase: Boolean,
+    exerciseType: String,
     onBack: () -> Unit
 ) {
     // 画面の「寿命（ライフサイクル）」を管理するオブジェクトを取得
@@ -42,6 +49,40 @@ fun TimerPlayerScreen(
     // YouTubeの動画IDのみを抽出（URL形式でもID形式でも対応）
     val videoIdOnly = remember(video.id) {
         video.id.trim().split("v=").last().split("&").first().split("/").last()
+    }
+
+    var shakeCount by remember { mutableIntStateOf(0) }
+    var isSensorAvailable by remember { mutableStateOf(true) }
+    val context = LocalContext.current
+
+    // 運動フェーズかつシェイク運動が選ばれている場合のみセンサーを有効化
+    DisposableEffect(isExercisePhase, exerciseType) {
+        var sensorManager: SensorManager? = null
+        var shakeDetector: ShakeDetector? = null
+
+        if (isExercisePhase && exerciseType == "スマホを振る") {
+            sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
+            val accelerometer = sensorManager?.getDefaultSensor(android.hardware.Sensor.TYPE_ACCELEROMETER)
+            
+            if (accelerometer != null) {
+                isSensorAvailable = true
+                shakeDetector = ShakeDetector {
+                    shakeCount++
+                }
+                
+                sensorManager?.registerListener(
+                    shakeDetector,
+                    accelerometer,
+                    SensorManager.SENSOR_DELAY_UI
+                )
+            } else {
+                isSensorAvailable = false
+            }
+        }
+
+        onDispose {
+            sensorManager?.unregisterListener(shakeDetector)
+        }
     }
 
     val phaseColor by animateColorAsState(
@@ -94,11 +135,20 @@ fun TimerPlayerScreen(
                         fontWeight = FontWeight.Black
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Finish the training!",
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = Color.White.copy(alpha = 0.8f)
-                    )
+                    if (exerciseType == "スマホを振る") {
+                        Text(
+                            text = "🔥 シェイク回数: $shakeCount 回",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.tertiaryContainer,
+                            fontWeight = FontWeight.Bold
+                        )
+                    } else {
+                        Text(
+                            text = "Finish the training!",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.White.copy(alpha = 0.8f)
+                        )
+                    }
                 }
             }
         }
@@ -138,7 +188,9 @@ fun TimerPlayerScreen(
                 containerColor = if (isExercisePhase) MaterialTheme.colorScheme.tertiaryContainer
                 else MaterialTheme.colorScheme.secondaryContainer
             ),
-            modifier = Modifier.padding(horizontal = 32.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(horizontal = 32.dp)
+                .fillMaxWidth(),
             shape = RoundedCornerShape(24.dp)
         ) {
             Text(
@@ -147,6 +199,17 @@ fun TimerPlayerScreen(
                 modifier = Modifier.padding(20.dp),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Medium
+            )
+        }
+
+        if (!isSensorAvailable && isExercisePhase && exerciseType == "スマホを振る") {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = stringResource(R.string.error_sensor_not_available),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 32.dp)
             )
         }
 

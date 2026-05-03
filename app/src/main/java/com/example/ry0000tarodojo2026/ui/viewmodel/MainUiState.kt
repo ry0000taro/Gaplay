@@ -10,5 +10,6 @@ data class MainUiState(
     val lastQuery: String = "K-POP",
     val lastMinutes: String = "3",
     val exerciseSeconds: Long = 0,
-    val isExercisePhase: Boolean = false
+    val isExercisePhase: Boolean = false,
+    val exerciseType: String = "選択なし"
 )
