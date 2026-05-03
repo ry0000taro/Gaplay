@@ -21,6 +21,8 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTube
 import android.content.Context
 import android.hardware.SensorManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.example.ry0000tarodojo2026.R
 import com.example.ry0000tarodojo2026.data.model.VideoEntity
 import com.example.ry0000tarodojo2026.utils.ShakeDetector
 import java.util.Locale
@@ -186,7 +188,9 @@ fun TimerPlayerScreen(
                 containerColor = if (isExercisePhase) MaterialTheme.colorScheme.tertiaryContainer
                 else MaterialTheme.colorScheme.secondaryContainer
             ),
-            modifier = Modifier.padding(horizontal = 32.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(horizontal = 32.dp)
+                .fillMaxWidth(),
             shape = RoundedCornerShape(24.dp)
         ) {
             Text(
@@ -201,7 +205,7 @@ fun TimerPlayerScreen(
         if (!isSensorAvailable && isExercisePhase && exerciseType == "スマホを振る") {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "⚠️ 端末にセンサーがないため、この機能は使用できません",
+                text = stringResource(R.string.error_sensor_not_available),
                 color = MaterialTheme.colorScheme.error,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
