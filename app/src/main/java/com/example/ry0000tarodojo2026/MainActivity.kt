@@ -7,39 +7,26 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.room.Room
-import com.example.ry0000tarodojo2026.data.api.RetrofitInstance
-import com.example.ry0000tarodojo2026.data.local.AppDatabase
-import com.example.ry0000tarodojo2026.data.local.SearchPrefs
-import com.example.ry0000tarodojo2026.data.repository.YouTubeRepository
 import com.example.ry0000tarodojo2026.ui.viewmodel.MainViewModel
 import com.example.ry0000tarodojo2026.ui.viewmodel.TimerViewModel
-import com.example.ry0000tarodojo2026.ui.viewmodel.TimerViewModelFactory
 import com.example.ry0000tarodojo2026.ui.components.SearchHeaderCard
 import com.example.ry0000tarodojo2026.ui.screens.SearchListScreen
 import com.example.ry0000tarodojo2026.ui.screens.TimerPlayerScreen
 import com.example.ry0000tarodojo2026.ui.theme.Ry0000tarodojo2026Theme
+import dagger.hilt.android.AndroidEntryPoint
+import androidx.hilt.navigation.compose.hiltViewModel
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val db = Room.databaseBuilder(
-            applicationContext,
-            AppDatabase::class.java, "youtube-db"
-        ).build()
-
-        val searchPrefs = SearchPrefs(applicationContext)
-        val repository = YouTubeRepository(RetrofitInstance.api, db.videoDao())
-        val viewModel = MainViewModel(repository, searchPrefs)
-        val timerViewModel = ViewModelProvider(this, TimerViewModelFactory(repository))[TimerViewModel::class.java]
-
         setContent {
+            val viewModel: MainViewModel = hiltViewModel()
             val navController = rememberNavController()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -76,6 +63,7 @@ class MainActivity : ComponentActivity() {
                             }
 
                             composable("timer_player/{videoId}") { backStackEntry ->
+                                val timerViewModel: TimerViewModel = hiltViewModel()
                                 val videoId = backStackEntry.arguments?.getString("videoId") ?: ""
                                 val videoEntity by timerViewModel.getVideoById(videoId).collectAsState(initial = null)
 
