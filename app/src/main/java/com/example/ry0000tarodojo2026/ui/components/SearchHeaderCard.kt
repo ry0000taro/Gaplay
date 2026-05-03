@@ -5,22 +5,23 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.ry0000tarodojo2026.data.model.ExerciseType
 
 @Composable
 fun SearchHeaderCard(
     initialQuery: String,
     initialMinutes: String,
-    initialExerciseType: String,
+    initialExerciseType: ExerciseType,
     isLoading: Boolean,
-    onSearch: (String, Long, String) -> Unit
+    onSearch: (String, Long, ExerciseType) -> Unit
 ) {
     var query by remember { mutableStateOf(initialQuery) }
     var minutes by remember { mutableStateOf(initialMinutes) }
     var exerciseType by remember { mutableStateOf(initialExerciseType) }
     var expanded by remember { mutableStateOf(false) }
-    val exerciseOptions = listOf("選択なし", "スマホを振る")
 
     LaunchedEffect(initialQuery, initialMinutes, initialExerciseType) {
         query = initialQuery
@@ -48,7 +49,7 @@ fun SearchHeaderCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(
-                    value = exerciseType,
+                    value = stringResource(exerciseType.displayNameRes),
                     onValueChange = {},
                     readOnly = true,
                     label = { Text("運動 (Exercise)") },
@@ -60,11 +61,11 @@ fun SearchHeaderCard(
                     expanded = expanded,
                     onDismissRequest = { expanded = false }
                 ) {
-                    exerciseOptions.forEach { option ->
+                    ExerciseType.entries.forEach { type ->
                         DropdownMenuItem(
-                            text = { Text(option) },
+                            text = { Text(stringResource(type.displayNameRes)) },
                             onClick = {
-                                exerciseType = option
+                                exerciseType = type
                                 expanded = false
                             }
                         )
