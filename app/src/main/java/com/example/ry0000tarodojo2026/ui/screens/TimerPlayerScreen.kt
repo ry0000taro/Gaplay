@@ -23,6 +23,7 @@ import android.hardware.SensorManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.example.ry0000tarodojo2026.R
+import com.example.ry0000tarodojo2026.data.model.ExerciseType
 import com.example.ry0000tarodojo2026.data.model.VideoEntity
 import com.example.ry0000tarodojo2026.utils.ShakeDetector
 import java.util.Locale
@@ -33,7 +34,7 @@ fun TimerPlayerScreen(
     remainingSeconds: Long,
     exerciseSeconds: Long,
     isExercisePhase: Boolean,
-    exerciseType: String,
+    exerciseType: ExerciseType,
     onBack: () -> Unit
 ) {
     // 画面の「寿命（ライフサイクル）」を管理するオブジェクトを取得
@@ -60,7 +61,7 @@ fun TimerPlayerScreen(
         var sensorManager: SensorManager? = null
         var shakeDetector: ShakeDetector? = null
 
-        if (isExercisePhase && exerciseType == "スマホを振る") {
+        if (isExercisePhase && exerciseType == ExerciseType.SHAKE) {
             sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
             val accelerometer = sensorManager?.getDefaultSensor(android.hardware.Sensor.TYPE_ACCELEROMETER)
             
@@ -135,7 +136,7 @@ fun TimerPlayerScreen(
                         fontWeight = FontWeight.Black
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    if (exerciseType == "スマホを振る") {
+                    if (exerciseType == ExerciseType.SHAKE) {
                         Text(
                             text = "🔥 シェイク回数: $shakeCount 回",
                             style = MaterialTheme.typography.headlineMedium,
@@ -202,7 +203,7 @@ fun TimerPlayerScreen(
             )
         }
 
-        if (!isSensorAvailable && isExercisePhase && exerciseType == "スマホを振る") {
+        if (!isSensorAvailable && isExercisePhase && exerciseType == ExerciseType.SHAKE) {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = stringResource(R.string.error_sensor_not_available),
@@ -216,7 +217,7 @@ fun TimerPlayerScreen(
         Spacer(modifier = Modifier.weight(1f))
 
         TextButton(onClick = onBack, modifier = Modifier.padding(bottom = 32.dp)) {
-            Text("リストに戻る", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.back_to_resouce), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
