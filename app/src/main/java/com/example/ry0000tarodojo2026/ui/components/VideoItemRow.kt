@@ -9,17 +9,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import com.example.ry0000tarodojo2026.data.model.ExerciseType
 import com.example.ry0000tarodojo2026.data.model.VideoEntity
 
 @Composable
 fun VideoItemRow(
     video: VideoEntity,
     exerciseTimeText: String,
-    exerciseType: String
+    exerciseType: ExerciseType
 ) {
     ElevatedCard(
         modifier = Modifier
@@ -79,14 +81,14 @@ fun VideoItemRow(
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Bold
                             )
-                            if (exerciseType != "選択なし") {
+                            if (exerciseType != ExerciseType.NONE) {
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Surface(
                                     color = MaterialTheme.colorScheme.secondaryContainer,
                                     shape = MaterialTheme.shapes.small
                                 ) {
                                     Text(
-                                        text = exerciseType,
+                                        text = stringResource(exerciseType.displayNameRes),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
