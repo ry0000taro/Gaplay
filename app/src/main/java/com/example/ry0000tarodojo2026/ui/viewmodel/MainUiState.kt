@@ -1,5 +1,6 @@
 package com.example.ry0000tarodojo2026.ui.viewmodel
 
+import com.example.ry0000tarodojo2026.data.model.ExerciseType
 import com.example.ry0000tarodojo2026.data.model.VideoEntity
 
 data class MainUiState(
@@ -11,5 +12,5 @@ data class MainUiState(
     val lastMinutes: String = "3",
     val exerciseSeconds: Long = 0,
     val isExercisePhase: Boolean = false,
-    val exerciseType: String = "選択なし"
+    val exerciseType: ExerciseType = ExerciseType.NONE
 )

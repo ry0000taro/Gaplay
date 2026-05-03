@@ -3,6 +3,7 @@ package com.example.ry0000tarodojo2026.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ry0000tarodojo2026.data.local.SearchPrefs
+import com.example.ry0000tarodojo2026.data.model.ExerciseType
 import com.example.ry0000tarodojo2026.data.model.VideoEntity
 import com.example.ry0000tarodojo2026.data.repository.YouTubeRepository
 import kotlinx.coroutines.flow.*
@@ -50,42 +51,33 @@ class MainViewModel(
         }.launchIn(viewModelScope)
     }
 
-    fun searchVideos(apiKey: String, query: String, limitSeconds: Long, exerciseType: String) {
+    // 引数を ExerciseType に変更
+    fun searchVideos(apiKey: String, query: String, limitSeconds: Long, exerciseType: ExerciseType) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            // 秒数を「分」の文字列に戻して保存（SearchPrefsがStringを期待しているため）
             val minutesString = (limitSeconds / 60).toString()
             searchPrefs.saveSearchConditions(query, minutesString, exerciseType)
-
-            // 検索実行（すでに秒数になっているのでそのまま渡す）
             repository.refreshVideosWithinDuration(apiKey, query, limitSeconds)
-
             _uiState.update { it.copy(isLoading = false) }
         }
     }
 
     fun onVideoSelect(video: VideoEntity) {
-        // 1. 動画の長さを秒に変換
         val videoSeconds = parseDurationToSeconds(video.id, video.duration)
-        // 2. ユーザーが設定した目標時間を秒に変換 (uiStateから現在の値を取得)
         val targetSeconds = (_uiState.value.lastMinutes.toLongOrNull() ?: 3L) * 60
-        // 3. 差分（エクササイズ時間）を計算
         val exerciseSec = (targetSeconds - videoSeconds).coerceAtLeast(0L)
-        // 4. UiState を一気に更新！
         _uiState.update { it.copy(
             selectedVideo = video,
-            exerciseSeconds = exerciseSec // ★ここを忘れずに追加！
+            exerciseSeconds = exerciseSec
         ) }
         timerManager.start(videoSeconds, exerciseSec)
     }
+
     fun onBackToList() {
         _uiState.update { it.copy(selectedVideo = null) }
         timerManager.stop()
     }
 
-    /**
-     * "M:SS" 形式の文字列を秒数(Long)に変換するヘルパー関数
-     */
     private fun parseDurationToSeconds(id: String, duration: String?): Long {
         if (duration == null) return 180L
         return try {
