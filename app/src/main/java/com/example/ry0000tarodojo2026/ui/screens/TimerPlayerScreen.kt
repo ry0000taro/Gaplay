@@ -50,6 +50,7 @@ fun TimerPlayerScreen(
     }
 
     var shakeCount by remember { mutableIntStateOf(0) }
+    var isSensorAvailable by remember { mutableStateOf(true) }
     val context = LocalContext.current
 
     // 運動フェーズかつシェイク運動が選ばれている場合のみセンサーを有効化
@@ -58,18 +59,23 @@ fun TimerPlayerScreen(
         var shakeDetector: ShakeDetector? = null
 
         if (isExercisePhase && exerciseType == "スマホを振る") {
-            sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
-            val accelerometer = sensorManager.getDefaultSensor(android.hardware.Sensor.TYPE_ACCELEROMETER)
+            sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
+            val accelerometer = sensorManager?.getDefaultSensor(android.hardware.Sensor.TYPE_ACCELEROMETER)
             
-            shakeDetector = ShakeDetector {
-                shakeCount++
+            if (accelerometer != null) {
+                isSensorAvailable = true
+                shakeDetector = ShakeDetector {
+                    shakeCount++
+                }
+                
+                sensorManager?.registerListener(
+                    shakeDetector,
+                    accelerometer,
+                    SensorManager.SENSOR_DELAY_UI
+                )
+            } else {
+                isSensorAvailable = false
             }
-            
-            sensorManager.registerListener(
-                shakeDetector,
-                accelerometer,
-                SensorManager.SENSOR_DELAY_UI
-            )
         }
 
         onDispose {
@@ -189,6 +195,17 @@ fun TimerPlayerScreen(
                 modifier = Modifier.padding(20.dp),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Medium
+            )
+        }
+
+        if (!isSensorAvailable && isExercisePhase && exerciseType == "スマホを振る") {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "⚠️ 端末にセンサーがないため、この機能は使用できません",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 32.dp)
             )
         }
 
