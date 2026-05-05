@@ -217,7 +217,7 @@ fun TimerPlayerScreen(
         Spacer(modifier = Modifier.weight(1f))
 
         TextButton(onClick = onBack, modifier = Modifier.padding(bottom = 32.dp)) {
-            Text(stringResource(R.string.back_to_resouce), color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.back_to_resource), color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
