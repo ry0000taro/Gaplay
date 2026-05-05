@@ -43,23 +43,14 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-            val videoList = uiState.videoList
-            val isLoading = uiState.isLoading
-            val savedQuery = uiState.lastQuery
-            val savedMinutes = uiState.lastMinutes
-            val remainingSeconds = uiState.remainingSeconds
-            val exerciseSeconds = uiState.exerciseSeconds
-            val isExercisePhase = uiState.isExercisePhase
-            val exerciseType = uiState.exerciseType
-
             Ry0000tarodojo2026Theme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
                     Column(modifier = Modifier.fillMaxSize()) {
                         SearchHeaderCard(
-                            initialQuery = savedQuery,
-                            initialMinutes = savedMinutes,
-                            initialExerciseType = exerciseType,
-                            isLoading = isLoading,
+                            initialQuery = uiState.lastQuery,
+                            initialMinutes = uiState.lastMinutes,
+                            initialExerciseType = uiState.exerciseType,
+                            isLoading = uiState.isLoading,
                             onSearch = { query, seconds, selectedExercise ->
                                 viewModel.searchVideos(BuildConfig.YOUTUBE_API_KEY, query, seconds, selectedExercise)
                             }
@@ -68,9 +59,9 @@ class MainActivity : ComponentActivity() {
                         NavHost(navController = navController, startDestination = Routes.SEARCH_LIST, modifier = Modifier.weight(1f)) {
                             composable(Routes.SEARCH_LIST) {
                                 SearchListScreen(
-                                    videoList = videoList,
-                                    targetMinutes = savedMinutes,
-                                    exerciseType = exerciseType,
+                                    videoList = uiState.videoList,
+                                    targetMinutes = uiState.lastMinutes,
+                                    exerciseType = uiState.exerciseType,
                                     onVideoSelect = { video ->
                                         viewModel.onVideoSelect(video)
                                         navController.navigate("timer_player/${video.id}")
@@ -84,10 +75,10 @@ class MainActivity : ComponentActivity() {
 
                                 TimerPlayerScreen(
                                     video = videoEntity,
-                                    remainingSeconds = remainingSeconds,
-                                    exerciseSeconds = exerciseSeconds,
-                                    isExercisePhase = isExercisePhase,
-                                    exerciseType = exerciseType,
+                                    remainingSeconds = uiState.remainingSeconds,
+                                    exerciseSeconds = uiState.exerciseSeconds,
+                                    isExercisePhase = uiState.isExercisePhase,
+                                    exerciseType = uiState.exerciseType,
                                     onBack = {
                                         viewModel.onBackToList()
                                         navController.popBackStack()
