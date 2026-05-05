@@ -93,3 +93,6 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 ksp {
     arg("ksp.incremental", "false") // JVM signatureエラーを防ぎます
 }
+tasks.register("testClasses") {
+    description = "Dummy task to satisfy IDEs that expect a standard Java project"
+}
