@@ -8,11 +8,6 @@ import kotlin.math.sqrt
 
 class ShakeDetector(private val onShake: () -> Unit) : SensorEventListener {
 
-    // シェイクを判定する加速度のしきい値（後で微調整）
-    private val SHAKE_THRESHOLD_GRAVITY = 2.0f
-    
-    // 連続でカウントされるのを防ぐためのクールダウン（ミリ秒）
-    private val SHAKE_SLOP_TIME_MS = 500
     private var shakeTimestamp: Long = 0
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
@@ -43,5 +38,13 @@ class ShakeDetector(private val onShake: () -> Unit) : SensorEventListener {
                 }
             }
         }
+    }
+
+    companion object {
+        // シェイクを判定する加速度のしきい値
+        private const val SHAKE_THRESHOLD_GRAVITY = 2.0f
+
+        // 連続でカウントされるのを防ぐためのクールダウン（ミリ秒）
+        private const val SHAKE_SLOP_TIME_MS = 500
     }
 }
