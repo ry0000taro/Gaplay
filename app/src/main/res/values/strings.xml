@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">ry0000taro.dojo2026</string>
+    <string name="error_sensor_not_available">⚠️ 端末にセンサーがないため、この機能は使用できません</string>
+    <string name="back_to_resource">リストに戻る</string>
+    <string name="exercise_none">選択なし</string>
+    <string name="exercise_shake">スマホを振る</string>
 </resources>

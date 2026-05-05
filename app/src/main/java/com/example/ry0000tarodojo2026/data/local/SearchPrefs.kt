@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.ry0000tarodojo2026.data.model.ExerciseType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -14,16 +15,21 @@ class SearchPrefs(private val context: Context) {
     // 保存するためのキー（合言葉）を決める
     private val KEY_QUERY = stringPreferencesKey("last_query")
     private val KEY_MINUTES = stringPreferencesKey("last_minutes")
+    private val KEY_EXERCISE_TYPE = stringPreferencesKey("last_exercise_type_id")
 
     // 読み込み（データが流れるパイプ）
     val lastQuery: Flow<String> = context.dataStore.data.map { it[KEY_QUERY] ?: "カップ麺" }
     val lastMinutes: Flow<String> = context.dataStore.data.map { it[KEY_MINUTES] ?: "3" }
+    val lastExerciseType: Flow<ExerciseType> = context.dataStore.data.map { 
+        ExerciseType.fromId(it[KEY_EXERCISE_TYPE]) 
+    }
 
     // 保存（書き込み処理）
-    suspend fun saveSearchConditions(query: String, minutes: String) {
+    suspend fun saveSearchConditions(query: String, minutes: String, exerciseType: ExerciseType) {
         context.dataStore.edit { prefs ->
             prefs[KEY_QUERY] = query
             prefs[KEY_MINUTES] = minutes
+            prefs[KEY_EXERCISE_TYPE] = exerciseType.id
         }
     }
 }

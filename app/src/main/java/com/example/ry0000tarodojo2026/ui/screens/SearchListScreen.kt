@@ -8,14 +8,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.example.ry0000tarodojo2026.data.model.ExerciseType
 import com.example.ry0000tarodojo2026.data.model.VideoEntity
-// ★ ここのインポートが component 側を向いているか確認
 import com.example.ry0000tarodojo2026.ui.components.VideoItemRow
 
 @Composable
 fun SearchListScreen(
     videoList: List<VideoEntity>,
     targetMinutes: String,
+    exerciseType: ExerciseType,
     onVideoSelect: (VideoEntity) -> Unit
 ) {
     val targetSeconds = (targetMinutes.toLongOrNull() ?: 3L) * 60
@@ -33,7 +34,8 @@ fun SearchListScreen(
             Surface(onClick = { onVideoSelect(video) }, color = Color.Transparent) {
                 VideoItemRow(
                     video = video,
-                    exerciseTimeText = exerciseText
+                    exerciseTimeText = exerciseText,
+                    exerciseType = exerciseType
                 )
             }
         }
