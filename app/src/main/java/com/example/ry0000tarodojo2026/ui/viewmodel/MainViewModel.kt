@@ -8,14 +8,11 @@ import com.example.ry0000tarodojo2026.data.model.VideoEntity
 import com.example.ry0000tarodojo2026.data.repository.YouTubeRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 
 /**
  * 画面のデータを管理する監督役（ViewModel）
  */
-@HiltViewModel
-class MainViewModel @Inject constructor(
+class MainViewModel(
     private val repository: YouTubeRepository,
     private val searchPrefs: SearchPrefs
 ) : ViewModel() {
