@@ -217,8 +217,9 @@ fun TimerPlayerScreen(
                         color = MaterialTheme.colorScheme.onBackground,
                         fontWeight = FontWeight.ExtraBold
                     )
+                    val displayExerciseSeconds = if (isExercisePhase) remainingSeconds else exerciseSeconds
                     Text(
-                        text = "EXERCISE PHASE: " + String.format(Locale.US, "%02d:%02d", exerciseSeconds / 60, exerciseSeconds % 60),
+                        text = "EXERCISE PHASE: " + String.format(Locale.US, "%02d:%02d", displayExerciseSeconds / 60, displayExerciseSeconds % 60),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.tertiary,
                         fontWeight = FontWeight.Bold
