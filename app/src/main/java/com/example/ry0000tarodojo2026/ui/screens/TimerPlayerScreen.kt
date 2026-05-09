@@ -33,8 +33,6 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.Abs
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import android.content.Context
 import android.hardware.SensorManager
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import com.example.ry0000tarodojo2026.R
 import com.example.ry0000tarodojo2026.data.model.ExerciseType
 import com.example.ry0000tarodojo2026.data.model.VideoEntity
