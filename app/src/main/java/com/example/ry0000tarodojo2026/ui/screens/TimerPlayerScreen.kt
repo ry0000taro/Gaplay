@@ -340,7 +340,7 @@ fun TimerPlayerScreen(
                     Spacer(modifier = Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "EXCISE",
+                            text = "EXERCISE",
                             style = MaterialTheme.typography.labelSmall,
                             color = Color.Gray,
                             fontWeight = FontWeight.Bold
