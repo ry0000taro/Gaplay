@@ -1,6 +1,5 @@
 package com.example.ry0000tarodojo2026.ui.screens
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -115,7 +114,7 @@ fun TimerPlayerScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         TopAppBar(
             title = { Text("Home", fontWeight = FontWeight.Bold) },
@@ -124,7 +123,10 @@ fun TimerPlayerScreen(
                     Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                 }
             },
-            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.White)
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+                titleContentColor = MaterialTheme.colorScheme.onSurface
+            )
         )
 
         // Content
@@ -141,12 +143,16 @@ fun TimerPlayerScreen(
                 modifier = Modifier.size(200.dp),
                 contentAlignment = Alignment.Center
             ) {
+                val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
+                val primaryColor = MaterialTheme.colorScheme.primary
+                val tertiaryColor = MaterialTheme.colorScheme.tertiary
+
                 Canvas(modifier = Modifier.size(200.dp)) {
                     val strokeWidth = 12.dp.toPx()
                     
                     // Background track (Gray) for passed time
                     drawCircle(
-                        color = Color(0xFFF0F0F0),
+                        color = surfaceVariantColor,
                         style = Stroke(strokeWidth)
                     )
                     
@@ -160,10 +166,10 @@ fun TimerPlayerScreen(
                         val exerciseSweep = 360f * exerciseSeconds / totalTimeFloat
                         val videoSweepAngle = 360f * videoSeconds / totalTimeFloat
                         
-                        // Remaining Video (Blue)
+                        // Remaining Video (Blue -> Primary)
                         if (remainingVideoSweep > 0) {
                             drawArc(
-                                color = Color(0xFF5A72A0),
+                                color = primaryColor,
                                 startAngle = -90f + elapsedVideoSweep,
                                 sweepAngle = remainingVideoSweep,
                                 useCenter = false,
@@ -171,10 +177,10 @@ fun TimerPlayerScreen(
                             )
                         }
                         
-                        // Remaining Exercise (Orange)
+                        // Remaining Exercise (Orange -> Tertiary)
                         if (exerciseSweep > 0) {
                             drawArc(
-                                color = Color(0xFFFF7A00),
+                                color = tertiaryColor,
                                 startAngle = -90f + videoSweepAngle,
                                 sweepAngle = exerciseSweep,
                                 useCenter = false,
@@ -188,7 +194,7 @@ fun TimerPlayerScreen(
                         
                         if (remainingExerciseSweep > 0) {
                             drawArc(
-                                color = Color(0xFFFF7A00),
+                                color = tertiaryColor,
                                 startAngle = startAngle,
                                 sweepAngle = remainingExerciseSweep,
                                 useCenter = false,
@@ -202,19 +208,19 @@ fun TimerPlayerScreen(
                     Text(
                         text = "TOTAL",
                         style = MaterialTheme.typography.labelSmall,
-                        color = Color.Gray,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = String.format(Locale.US, "%02d:%02d", remainingSeconds / 60, remainingSeconds % 60),
                         style = MaterialTheme.typography.displayMedium,
-                        color = Color(0xFF333333),
+                        color = MaterialTheme.colorScheme.onBackground,
                         fontWeight = FontWeight.ExtraBold
                     )
                     Text(
-                        text = "EXCISE PHASE: " + String.format(Locale.US, "%02d:%02d", exerciseSeconds / 60, exerciseSeconds % 60),
+                        text = "EXERCISE PHASE: " + String.format(Locale.US, "%02d:%02d", exerciseSeconds / 60, exerciseSeconds % 60),
                         style = MaterialTheme.typography.labelSmall,
-                        color = Color(0xFFFF7A00),
+                        color = MaterialTheme.colorScheme.tertiary,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -230,21 +236,23 @@ fun TimerPlayerScreen(
             ) {
                 Button(
                     onClick = { /* Pause logic placeholder */ },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A5D8A)),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp)
                 ) {
-                    Icon(Icons.Default.Pause, contentDescription = "Pause", modifier = Modifier.size(18.dp))
+                    Icon(Icons.Default.Pause, contentDescription = "Pause", modifier = Modifier.size(18.dp), tint = MaterialTheme.colorScheme.onPrimaryContainer)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Pause")
+                    Text("Pause", color = MaterialTheme.colorScheme.onPrimaryContainer)
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 OutlinedButton(
                     onClick = onBack,
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFF333333)),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    ),
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp)
@@ -263,7 +271,7 @@ fun TimerPlayerScreen(
                     .fillMaxWidth()
                     .aspectRatio(16 / 9f)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(Color.Black),
+                    .background(MaterialTheme.colorScheme.scrim),
                 contentAlignment = Alignment.Center
             ) {
                 if (!isExercisePhase) {
@@ -290,7 +298,7 @@ fun TimerPlayerScreen(
                         Text(
                             text = "EXERCISE TIME!",
                             style = MaterialTheme.typography.headlineLarge,
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onBackground,
                             fontWeight = FontWeight.Black
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -305,7 +313,7 @@ fun TimerPlayerScreen(
                             Text(
                                 text = "Finish the training!",
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = Color.White.copy(alpha = 0.8f)
+                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
                             )
                         }
                     }
@@ -316,7 +324,9 @@ fun TimerPlayerScreen(
 
             // Exercise Info Card
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F6F8)),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                ),
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -328,13 +338,13 @@ fun TimerPlayerScreen(
                         modifier = Modifier
                             .size(40.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFFDCE2EF)),
+                            .background(MaterialTheme.colorScheme.primaryContainer),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Default.FitnessCenter,
                             contentDescription = "Exercise",
-                            tint = Color(0xFF5A72A0)
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                     Spacer(modifier = Modifier.width(16.dp))
@@ -342,18 +352,18 @@ fun TimerPlayerScreen(
                         Text(
                             text = "EXERCISE",
                             style = MaterialTheme.typography.labelSmall,
-                            color = Color.Gray,
+                            color = MaterialTheme.colorScheme.outline,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
                             text = exerciseType.name,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF333333)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = "120 kcal",
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFFFF7A00),
+                            color = MaterialTheme.colorScheme.tertiary,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -368,7 +378,9 @@ fun TimerPlayerScreen(
 
             // Channel Info Card
             Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F6F8)),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                ),
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -379,7 +391,7 @@ fun TimerPlayerScreen(
                     Icon(
                         imageVector = Icons.Default.AccountCircle,
                         contentDescription = "Channel Icon",
-                        tint = Color(0xFF5A72A0),
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(40.dp)
                     )
                     Spacer(modifier = Modifier.width(16.dp))
@@ -387,12 +399,12 @@ fun TimerPlayerScreen(
                         Text(
                             text = video.channelTitle.ifBlank { "Elite Fitness" },
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF333333)
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             text = "1.2M views • 2 weeks ago",
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color.Gray
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                         )
                     }
                 }
