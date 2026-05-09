@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.ry0000tarodojo2026.data.model.ExerciseType
 import com.example.ry0000tarodojo2026.data.model.VideoEntity
+import com.example.ry0000tarodojo2026.ui.components.SearchHeaderCard
 import com.example.ry0000tarodojo2026.ui.components.VideoItemRow
 
 @Composable
@@ -17,26 +18,39 @@ fun SearchListScreen(
     videoList: List<VideoEntity>,
     targetMinutes: String,
     exerciseType: ExerciseType,
+    initialQuery: String,
+    isLoading: Boolean,
+    onSearch: (String, Long, ExerciseType) -> Unit,
     onVideoSelect: (VideoEntity) -> Unit
 ) {
     val targetSeconds = (targetMinutes.toLongOrNull() ?: 3L) * 60
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(videoList) { video ->
-            val videoSeconds = parseDurationToSeconds(video.duration)
-            val exerciseSec = (targetSeconds - videoSeconds).coerceAtLeast(0L)
-            val exerciseText = String.format("%01d:%02d", exerciseSec / 60, exerciseSec % 60)
+    Column(modifier = Modifier.fillMaxSize()) {
+        SearchHeaderCard(
+            initialQuery = initialQuery,
+            initialMinutes = targetMinutes,
+            initialExerciseType = exerciseType,
+            isLoading = isLoading,
+            onSearch = onSearch
+        )
 
-            Surface(onClick = { onVideoSelect(video) }, color = Color.Transparent) {
-                VideoItemRow(
-                    video = video,
-                    exerciseTimeText = exerciseText,
-                    exerciseType = exerciseType
-                )
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(videoList) { video ->
+                val videoSeconds = parseDurationToSeconds(video.duration)
+                val exerciseSec = (targetSeconds - videoSeconds).coerceAtLeast(0L)
+                val exerciseText = String.format("%01d:%02d", exerciseSec / 60, exerciseSec % 60)
+
+                Surface(onClick = { onVideoSelect(video) }, color = Color.Transparent) {
+                    VideoItemRow(
+                        video = video,
+                        exerciseTimeText = exerciseText,
+                        exerciseType = exerciseType
+                    )
+                }
             }
         }
     }
