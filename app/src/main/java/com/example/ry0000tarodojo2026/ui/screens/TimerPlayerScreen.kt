@@ -298,9 +298,9 @@ fun TimerPlayerScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         if (exerciseType == ExerciseType.SHAKE) {
                             Text(
-                                text = stringResource(R.string.ShakePoint) +
+                                text = stringResource(R.string.shake_point) +
                                         "$shakeCount " +
-                                        stringResource(R.string.Point),
+                                        stringResource(R.string.point),
                                 style = MaterialTheme.typography.headlineMedium,
                                 color = MaterialTheme.colorScheme.tertiaryContainer,
                                 fontWeight = FontWeight.Bold
