@@ -4,6 +4,6 @@
     <string name="back_to_resource">リストに戻る</string>
     <string name="exercise_none">選択なし</string>
     <string name="exercise_shake">スマホを振る</string>
-    <string name="ShakePoint">" シェイク回数: "</string>
-    <string name="Point">回</string>
+    <string name="shake_point">シェイク回数:</string>
+    <string name="point">回</string>
 </resources>
