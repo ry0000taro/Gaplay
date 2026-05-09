@@ -66,6 +66,40 @@ fun TimerPlayerScreen(
         video.id.trim().split("v=").last().split("&").first().split("/").last()
     }
 
+    var shakeCount by remember { mutableIntStateOf(0) }
+    var isSensorAvailable by remember { mutableStateOf(true) }
+    val context = LocalContext.current
+
+    // 運動フェーズかつシェイク運動が選ばれている場合のみセンサーを有効化
+    DisposableEffect(isExercisePhase, exerciseType) {
+        var sensorManager: SensorManager? = null
+        var shakeDetector: ShakeDetector? = null
+
+        if (isExercisePhase && exerciseType == ExerciseType.SHAKE) {
+            sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as? SensorManager
+            val accelerometer = sensorManager?.getDefaultSensor(android.hardware.Sensor.TYPE_ACCELEROMETER)
+            
+            if (accelerometer != null) {
+                isSensorAvailable = true
+                shakeDetector = ShakeDetector {
+                    shakeCount++
+                }
+                
+                sensorManager?.registerListener(
+                    shakeDetector,
+                    accelerometer,
+                    SensorManager.SENSOR_DELAY_UI
+                )
+            } else {
+                isSensorAvailable = false
+            }
+        }
+
+        onDispose {
+            sensorManager?.unregisterListener(shakeDetector)
+        }
+    }
+
     val videoSeconds = remember(video.duration) {
         if (video.duration == null) 180L
         else try {
@@ -231,25 +265,53 @@ fun TimerPlayerScreen(
                     .fillMaxWidth()
                     .aspectRatio(16 / 9f)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(Color.Black)
+                    .background(Color.Black),
+                contentAlignment = Alignment.Center
             ) {
-                AndroidView(
-                    factory = { context ->
-                        YouTubePlayerView(context).apply {
-                            // アプリのライフサイクル（停止・再開）とプレーヤーを連動させる
-                            lifecycleOwner.lifecycle.addObserver(this)
-
-                            // プレーヤーの準備ができたら動画をロードする
-                            addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
-                                override fun onReady(youTubePlayer: YouTubePlayer) {
-                                    // loadVideoで自動再生を開始
-                                    youTubePlayer.loadVideo(videoIdOnly, 0f)
-                                }
-                            })
+                if (!isExercisePhase) {
+                    AndroidView(
+                        factory = { context ->
+                            YouTubePlayerView(context).apply {
+                                // アプリのライフサイクル（停止・再開）とプレーヤーを連動させる
+                                lifecycleOwner.lifecycle.addObserver(this)
+    
+                                // プレーヤーの準備ができたら動画をロードする
+                                addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
+                                    override fun onReady(youTubePlayer: YouTubePlayer) {
+                                        // loadVideoで自動再生を開始
+                                        youTubePlayer.loadVideo(videoIdOnly, 0f)
+                                    }
+                                })
+                            }
+                        },
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    // 運動中（WORKOUT）の表示
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "EXERCISE TIME!",
+                            style = MaterialTheme.typography.headlineLarge,
+                            color = Color.White,
+                            fontWeight = FontWeight.Black
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        if (exerciseType == ExerciseType.SHAKE) {
+                            Text(
+                                text = "🔥 シェイク回数: $shakeCount 回",
+                                style = MaterialTheme.typography.headlineMedium,
+                                color = MaterialTheme.colorScheme.tertiaryContainer,
+                                fontWeight = FontWeight.Bold
+                            )
+                        } else {
+                            Text(
+                                text = "Finish the training!",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Color.White.copy(alpha = 0.8f)
+                            )
                         }
-                    },
-                    modifier = Modifier.fillMaxSize()
-                )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
