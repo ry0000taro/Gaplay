@@ -303,12 +303,23 @@ fun TimerPlayerScreen(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         if (exerciseType == ExerciseType.SHAKE) {
-                            Text(
-                                text = "Shake Count $shakeCount Point",
-                                style = MaterialTheme.typography.headlineMedium,
-                                color = MaterialTheme.colorScheme.tertiaryContainer,
-                                fontWeight = FontWeight.Bold
-                            )
+                            if (isSensorAvailable) {
+                                Text(
+                                    text = stringResource(R.string.shake_point) + " $shakeCount " + stringResource(R.string.point),
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    color = MaterialTheme.colorScheme.tertiaryContainer,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            } else {
+                                Text(
+                                    text = stringResource(R.string.error_sensor_not_available),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                )
+                            }
                         } else {
                             Text(
                                 text = "Finish the training!",
