@@ -291,7 +291,12 @@ fun TimerPlayerScreen(
                                 })
                             }
                         },
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
+                        onRelease = { view ->
+                            // 画面が閉じられるときにオブザーバーを解除し、プレーヤーを完全に破棄する
+                            lifecycleOwner.lifecycle.removeObserver(view)
+                            view.release()
+                        }
                     )
                 } else {
                     // 運動中（WORKOUT）の表示
