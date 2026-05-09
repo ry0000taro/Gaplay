@@ -13,10 +13,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.ry0000tarodojo2026.ui.viewmodel.MainViewModel
 import com.example.ry0000tarodojo2026.ui.viewmodel.TimerViewModel
-import com.example.ry0000tarodojo2026.ui.components.SearchHeaderCard
 import com.example.ry0000tarodojo2026.ui.screens.SearchListScreen
 import com.example.ry0000tarodojo2026.ui.screens.TimerPlayerScreen
 import com.example.ry0000tarodojo2026.ui.theme.Ry0000tarodojo2026Theme
+import com.example.ry0000tarodojo2026.ui.components.MainBottomBar
 import dagger.hilt.android.AndroidEntryPoint
 import androidx.hilt.navigation.compose.hiltViewModel
 
@@ -31,24 +31,27 @@ class MainActivity : ComponentActivity() {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
             Ry0000tarodojo2026Theme {
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        SearchHeaderCard(
-                            initialQuery = uiState.lastQuery,
-                            initialMinutes = uiState.lastMinutes,
-                            initialExerciseType = uiState.exerciseType,
-                            isLoading = uiState.isLoading,
-                            onSearch = { query, seconds, selectedExercise ->
-                                viewModel.searchVideos(BuildConfig.YOUTUBE_API_KEY, query, seconds, selectedExercise)
-                            }
-                        )
-
-                        NavHost(navController = navController, startDestination = Routes.SEARCH_LIST, modifier = Modifier.weight(1f)) {
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    bottomBar = { MainBottomBar(navController = navController) }
+                ) { innerPadding ->
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        NavHost(navController = navController, startDestination = Routes.SEARCH_LIST) {
                             composable(Routes.SEARCH_LIST) {
                                 SearchListScreen(
                                     videoList = uiState.videoList,
                                     targetMinutes = uiState.lastMinutes,
                                     exerciseType = uiState.exerciseType,
+                                    initialQuery = uiState.lastQuery,
+                                    isLoading = uiState.isLoading,
+                                    onSearch = { query, seconds, selectedExercise ->
+                                        viewModel.searchVideos(BuildConfig.YOUTUBE_API_KEY, query, seconds, selectedExercise)
+                                    },
                                     onVideoSelect = { video ->
                                         viewModel.onVideoSelect(video)
                                         navController.navigate("timer_player/${video.id}")
