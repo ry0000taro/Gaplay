@@ -85,18 +85,10 @@ class MainActivity : ComponentActivity() {
 
                         // --- 【上の層】 プレイヤー・オーバーレイ ---
                         if (uiState.selectedVideo != null) {
-                            val overlayModifier = if (uiState.playerMode == PlayerMode.FULL) {
-                                Modifier.fillMaxSize()
-                            } else {
-                                // ミニプレイヤー時は画面下部に配置し、ボトムバー分浮かせる
-                                Modifier
-                                    .align(Alignment.BottomCenter)
-                                    .padding(bottom = innerPadding.calculateBottomPadding())
-                            }
-
-                            Box(modifier = overlayModifier) {
+                            Box(modifier = Modifier.fillMaxSize()) {
                                 PlayerOverlay(
                                     uiState = uiState,
+                                    bottomPadding = innerPadding.calculateBottomPadding(),
                                     onCollapse = { viewModel.updatePlayerMode(PlayerMode.MINI) },
                                     onExpand = { viewModel.updatePlayerMode(PlayerMode.FULL) },
                                     onClose = { viewModel.closePlayer() }
