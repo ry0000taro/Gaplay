@@ -71,9 +71,22 @@ class MainViewModel @Inject constructor(
         val exerciseSec = (targetSeconds - videoSeconds).coerceAtLeast(0L)
         _uiState.update { it.copy(
             selectedVideo = video,
-            exerciseSeconds = exerciseSec
+            exerciseSeconds = exerciseSec,
+            playerMode = PlayerMode.FULL
         ) }
         timerManager.start(videoSeconds, exerciseSec)
+    }
+
+    fun updatePlayerMode(mode: PlayerMode){
+        _uiState.update{
+            it.copy(playerMode = mode) }
+    }
+
+    fun closePlayer(){
+        _uiState.update{it.copy(
+            selectedVideo = null,
+            playerMode =  PlayerMode.HIDDEN
+        )}
     }
 
     fun onBackToList() {
