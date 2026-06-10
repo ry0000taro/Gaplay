@@ -19,7 +19,8 @@ import com.example.ry0000tarodojo2026.data.model.VideoEntity
 fun MiniPlayerBar(
     video: VideoEntity?,
     onExpand: () -> Unit,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    videoPlayerContent: @Composable () -> Unit
     ){
     if (video == null) return
 
@@ -40,10 +41,7 @@ fun MiniPlayerBar(
                     .width(110.dp)
                     .fillMaxHeight()
             ) {
-                VideoPlayerView(
-                    videoId = video.id,
-                    modifier = Modifier.fillMaxSize()
-                )
+                videoPlayerContent()
             }
             Column(
                 modifier = Modifier

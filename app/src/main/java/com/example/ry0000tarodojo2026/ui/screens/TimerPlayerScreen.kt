@@ -47,16 +47,16 @@ fun TimerPlayerScreen(
     exerciseSeconds: Long,
     isExercisePhase: Boolean,
     exerciseType: ExerciseType,
-    onBack: () -> Unit
-) {
-
+    onBack: () -> Unit,
+    videoPlayerContent: @Composable () -> Unit
+)
+{
     if (video == null) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
         }
         return
     }
-
 
     var shakeCount by remember { mutableIntStateOf(0) }
     var isSensorAvailable by remember { mutableStateOf(true) }
@@ -271,7 +271,7 @@ fun TimerPlayerScreen(
                 contentAlignment = Alignment.Center
             ) {
                 if (!isExercisePhase) {
-                   VideoPlayerView(videoId = video.id)
+                   videoPlayerContent()
                 } else {
                     // 運動中（WORKOUT）の表示
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
