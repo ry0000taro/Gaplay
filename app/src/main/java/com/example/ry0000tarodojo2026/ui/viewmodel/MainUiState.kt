@@ -3,6 +3,12 @@ package com.example.ry0000tarodojo2026.ui.viewmodel
 import com.example.ry0000tarodojo2026.data.model.ExerciseType
 import com.example.ry0000tarodojo2026.data.model.VideoEntity
 
+enum class PlayerMode{
+    HIDDEN,
+    FULL,
+    MINI
+}
+
 data class MainUiState(
     val videoList: List<VideoEntity> = emptyList(),
     val isLoading: Boolean = false,
@@ -12,5 +18,6 @@ data class MainUiState(
     val lastMinutes: String = "3",
     val exerciseSeconds: Long = 0,
     val isExercisePhase: Boolean = false,
-    val exerciseType: ExerciseType = ExerciseType.NONE
+    val exerciseType: ExerciseType = ExerciseType.NONE,
+    val playerMode: PlayerMode = PlayerMode.HIDDEN
 )
