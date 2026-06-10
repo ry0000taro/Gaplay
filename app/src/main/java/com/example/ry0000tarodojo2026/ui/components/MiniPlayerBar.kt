@@ -35,14 +35,16 @@ fun MiniPlayerBar(
             modifier = Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
         ){
-            AsyncImage(
-                model = video.thumbnailUrl,
-                contentDescription = null,
-                modifier = Modifier.width(110.dp)
-                    .fillMaxHeight(),
-                contentScale = ContentScale.Crop
-            )
-
+            Box(
+                modifier = Modifier
+                    .width(110.dp)
+                    .fillMaxHeight()
+            ) {
+                VideoPlayerView(
+                    videoId = video.id,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
             Column(
                 modifier = Modifier
                     .weight(1f)

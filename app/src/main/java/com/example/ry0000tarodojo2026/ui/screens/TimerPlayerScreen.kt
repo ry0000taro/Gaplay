@@ -35,6 +35,7 @@ import android.hardware.SensorManager
 import com.example.ry0000tarodojo2026.R
 import com.example.ry0000tarodojo2026.data.model.ExerciseType
 import com.example.ry0000tarodojo2026.data.model.VideoEntity
+import com.example.ry0000tarodojo2026.ui.components.VideoPlayerView
 import com.example.ry0000tarodojo2026.utils.ShakeDetector
 import java.util.Locale
 
@@ -48,8 +49,6 @@ fun TimerPlayerScreen(
     exerciseType: ExerciseType,
     onBack: () -> Unit
 ) {
-    // 画面の「寿命（ライフサイクル）」を管理するオブジェクトを取得
-    val lifecycleOwner = LocalLifecycleOwner.current
 
     if (video == null) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -58,10 +57,6 @@ fun TimerPlayerScreen(
         return
     }
 
-    // YouTubeの動画IDのみを抽出（URL形式でもID形式でも対応）
-    val videoIdOnly = remember(video.id) {
-        video.id.trim().split("v=").last().split("&").first().split("/").last()
-    }
 
     var shakeCount by remember { mutableIntStateOf(0) }
     var isSensorAvailable by remember { mutableStateOf(true) }
@@ -276,28 +271,7 @@ fun TimerPlayerScreen(
                 contentAlignment = Alignment.Center
             ) {
                 if (!isExercisePhase) {
-                    AndroidView(
-                        factory = { context ->
-                            YouTubePlayerView(context).apply {
-                                // アプリのライフサイクル（停止・再開）とプレーヤーを連動させる
-                                lifecycleOwner.lifecycle.addObserver(this)
-    
-                                // プレーヤーの準備ができたら動画をロードする
-                                addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
-                                    override fun onReady(youTubePlayer: YouTubePlayer) {
-                                        // loadVideoで自動再生を開始
-                                        youTubePlayer.loadVideo(videoIdOnly, 0f)
-                                    }
-                                })
-                            }
-                        },
-                        modifier = Modifier.fillMaxSize(),
-                        onRelease = { view ->
-                            // 画面が閉じられるときにオブザーバーを解除し、プレーヤーを完全に破棄する
-                            lifecycleOwner.lifecycle.removeObserver(view)
-                            view.release()
-                        }
-                    )
+                   VideoPlayerView(videoId = video.id)
                 } else {
                     // 運動中（WORKOUT）の表示
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
