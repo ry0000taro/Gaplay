@@ -5,9 +5,11 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.movableContentOf
@@ -68,7 +70,11 @@ fun PlayerOverlay(
                                         )
                                         .fillMaxSize()
                                 ) {
-                                    videoPlayer()
+                                    if (targetMode == uiState.playerMode) {
+                                        videoPlayer()
+                                    } else {
+                                        Box(modifier = Modifier.fillMaxSize().background(Color.Black))
+                                    }
                                 }
                             }
                         )
@@ -94,7 +100,11 @@ fun PlayerOverlay(
                                         )
                                         .fillMaxSize()
                                 ) {
-                                    videoPlayer()
+                                    if (targetMode == uiState.playerMode) {
+                                        videoPlayer()
+                                    } else {
+                                        Box(modifier = Modifier.fillMaxSize().background(Color.Black))
+                                    }
                                 }
                             }
                         )
