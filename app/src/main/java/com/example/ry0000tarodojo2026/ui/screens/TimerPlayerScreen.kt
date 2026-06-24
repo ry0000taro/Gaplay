@@ -48,6 +48,7 @@ fun TimerPlayerScreen(
     isExercisePhase: Boolean,
     exerciseType: ExerciseType,
     onBack: () -> Unit,
+    sharedBoundsModifier: Modifier = Modifier,
     videoPlayerContent: @Composable () -> Unit
 )
 {
@@ -267,6 +268,7 @@ fun TimerPlayerScreen(
                     .fillMaxWidth()
                     .aspectRatio(16 / 9f)
                     .clip(RoundedCornerShape(16.dp))
+                    .then(sharedBoundsModifier)
                     .background(MaterialTheme.colorScheme.scrim),
                 contentAlignment = Alignment.Center
             ) {

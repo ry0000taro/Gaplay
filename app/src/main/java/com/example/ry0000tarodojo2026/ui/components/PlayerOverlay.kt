@@ -47,6 +47,10 @@ fun PlayerOverlay(
             targetState = uiState.playerMode,
             label = "playerModeTransition"
         ) { targetMode ->
+            val sharedMod = Modifier.sharedBounds(
+                sharedContentState = rememberSharedContentState(key = "video-$videoId"),
+                animatedVisibilityScope = this@AnimatedContent
+            )
             when (targetMode) {
                 PlayerMode.FULL -> {
                     Box(
@@ -61,16 +65,12 @@ fun PlayerOverlay(
                             isExercisePhase = uiState.isExercisePhase,
                             exerciseType = uiState.exerciseType,
                             onBack = onCollapse,
+                            sharedBoundsModifier = sharedMod,
                             videoPlayerContent = {
                                 Box(
-                                    modifier = Modifier
-                                        .sharedBounds(
-                                            sharedContentState = rememberSharedContentState(key = "video-$videoId"),
-                                            animatedVisibilityScope = this@AnimatedContent
-                                        )
-                                        .fillMaxSize()
+                                    modifier = Modifier.fillMaxSize()
                                 ) {
-                                    if (targetMode == uiState.playerMode) {
+                                    if (targetMode == uiState.playerMode && !uiState.isExercisePhase) {
                                         videoPlayer()
                                     } else {
                                         Box(modifier = Modifier.fillMaxSize().background(Color.Black))
@@ -81,6 +81,10 @@ fun PlayerOverlay(
                     }
                 }
                 PlayerMode.MINI -> {
+                    val sharedMod = Modifier.sharedBounds(
+                        sharedContentState = rememberSharedContentState(key = "video-$videoId"),
+                        animatedVisibilityScope = this@AnimatedContent
+                    )
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -89,18 +93,15 @@ fun PlayerOverlay(
                     ) {
                         MiniPlayerBar(
                             video = uiState.selectedVideo,
+                            isExercisePhase = uiState.isExercisePhase,
                             onExpand = onExpand,
                             onClose = onClose,
+                            sharedBoundsModifier = sharedMod,
                             videoPlayerContent = {
                                 Box(
-                                    modifier = Modifier
-                                        .sharedBounds(
-                                            sharedContentState = rememberSharedContentState(key = "video-$videoId"),
-                                            animatedVisibilityScope = this@AnimatedContent
-                                        )
-                                        .fillMaxSize()
+                                    modifier = Modifier.fillMaxSize()
                                 ) {
-                                    if (targetMode == uiState.playerMode) {
+                                    if (targetMode == uiState.playerMode && !uiState.isExercisePhase) {
                                         videoPlayer()
                                     } else {
                                         Box(modifier = Modifier.fillMaxSize().background(Color.Black))

@@ -43,14 +43,24 @@ class MainViewModel @Inject constructor(
             timerManager.remainingSeconds,
             timerManager.isExercisePhase
         ) { videos, (query, mins, exType), seconds, isExercise ->
-            _uiState.update { it.copy(
-                videoList = videos,
-                lastQuery = query,
-                lastMinutes = mins,
-                exerciseType = exType,
-                remainingSeconds = seconds,
-                isExercisePhase = isExercise
-            ) }
+            _uiState.update { state ->
+                // 運動フェーズに突入した瞬間にミニプレイヤーならフルスクリーンに戻す
+                val newPlayerMode = if (isExercise && !state.isExercisePhase && state.playerMode == PlayerMode.MINI) {
+                    PlayerMode.FULL
+                } else {
+                    state.playerMode
+                }
+                
+                state.copy(
+                    videoList = videos,
+                    lastQuery = query,
+                    lastMinutes = mins,
+                    exerciseType = exType,
+                    remainingSeconds = seconds,
+                    isExercisePhase = isExercise,
+                    playerMode = newPlayerMode
+                )
+            }
         }.launchIn(viewModelScope)
     }
 

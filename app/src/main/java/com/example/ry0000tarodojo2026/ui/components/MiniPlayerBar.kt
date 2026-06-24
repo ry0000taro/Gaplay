@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,10 +19,12 @@ import com.example.ry0000tarodojo2026.data.model.VideoEntity
 @Composable
 fun MiniPlayerBar(
     video: VideoEntity?,
+    isExercisePhase: Boolean = false,
     onExpand: () -> Unit,
     onClose: () -> Unit,
+    sharedBoundsModifier: Modifier = Modifier,
     videoPlayerContent: @Composable () -> Unit
-    ){
+){
     if (video == null) return
 
     Surface(
@@ -40,25 +43,47 @@ fun MiniPlayerBar(
                 modifier = Modifier
                     .width(110.dp)
                     .fillMaxHeight()
+                    .then(sharedBoundsModifier)
             ) {
-                videoPlayerContent()
+                if (isExercisePhase) {
+                    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.tertiaryContainer), contentAlignment = Alignment.Center) {
+                        Icon(Icons.Default.FitnessCenter, contentDescription = null, tint = MaterialTheme.colorScheme.onTertiaryContainer)
+                    }
+                } else {
+                    videoPlayerContent()
+                }
             }
             Column(
                 modifier = Modifier
                     .weight(1f)
                     .padding(horizontal = 12.dp)
             ){
-                Text(
-                    text = video.title,
-                    style= MaterialTheme.typography.bodyMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = video.channelTitle,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                if (isExercisePhase) {
+                    Text(
+                        text = "EXERCISE TIME!",
+                        style= MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = "Keep it up!",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    Text(
+                        text = video.title,
+                        style= MaterialTheme.typography.bodyMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = video.channelTitle,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
 
             IconButton(onClick = onClose){
