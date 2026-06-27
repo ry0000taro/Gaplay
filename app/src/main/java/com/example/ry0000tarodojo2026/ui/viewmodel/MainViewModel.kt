@@ -93,6 +93,7 @@ class MainViewModel @Inject constructor(
     }
 
     fun closePlayer(){
+        timerManager.stop()
         _uiState.update{it.copy(
             selectedVideo = null,
             playerMode =  PlayerMode.HIDDEN
