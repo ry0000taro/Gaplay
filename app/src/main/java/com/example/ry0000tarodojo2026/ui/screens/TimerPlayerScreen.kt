@@ -17,19 +17,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
-import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 import android.content.Context
 import android.hardware.SensorManager
 import com.example.ry0000tarodojo2026.R
@@ -46,21 +39,16 @@ fun TimerPlayerScreen(
     exerciseSeconds: Long,
     isExercisePhase: Boolean,
     exerciseType: ExerciseType,
-    onBack: () -> Unit
-) {
-    // 画面の「寿命（ライフサイクル）」を管理するオブジェクトを取得
-    val lifecycleOwner = LocalLifecycleOwner.current
-
+    onBack: () -> Unit,
+    sharedBoundsModifier: Modifier = Modifier,
+    videoPlayerContent: @Composable () -> Unit
+)
+{
     if (video == null) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
         }
         return
-    }
-
-    // YouTubeの動画IDのみを抽出（URL形式でもID形式でも対応）
-    val videoIdOnly = remember(video.id) {
-        video.id.trim().split("v=").last().split("&").first().split("/").last()
     }
 
     var shakeCount by remember { mutableIntStateOf(0) }
@@ -272,32 +260,12 @@ fun TimerPlayerScreen(
                     .fillMaxWidth()
                     .aspectRatio(16 / 9f)
                     .clip(RoundedCornerShape(16.dp))
+                    .then(sharedBoundsModifier)
                     .background(MaterialTheme.colorScheme.scrim),
                 contentAlignment = Alignment.Center
             ) {
                 if (!isExercisePhase) {
-                    AndroidView(
-                        factory = { context ->
-                            YouTubePlayerView(context).apply {
-                                // アプリのライフサイクル（停止・再開）とプレーヤーを連動させる
-                                lifecycleOwner.lifecycle.addObserver(this)
-    
-                                // プレーヤーの準備ができたら動画をロードする
-                                addYouTubePlayerListener(object : AbstractYouTubePlayerListener() {
-                                    override fun onReady(youTubePlayer: YouTubePlayer) {
-                                        // loadVideoで自動再生を開始
-                                        youTubePlayer.loadVideo(videoIdOnly, 0f)
-                                    }
-                                })
-                            }
-                        },
-                        modifier = Modifier.fillMaxSize(),
-                        onRelease = { view ->
-                            // 画面が閉じられるときにオブザーバーを解除し、プレーヤーを完全に破棄する
-                            lifecycleOwner.lifecycle.removeObserver(view)
-                            view.release()
-                        }
-                    )
+                   videoPlayerContent()
                 } else {
                     // 運動中（WORKOUT）の表示
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
