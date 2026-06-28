@@ -41,7 +41,7 @@ class AuthViewModel @Inject constructor() : ViewModel() {
         if (isLogin) {
             auth.signInWithEmailAndPassword(email, pass)
                 .addOnSuccessListener { onResult(true, null) }
-                .addOnFailureListener { onResult(false, it.localizedMessage) }
+                .addOnFailureListener { onResult(false, it.localizedMessage ?: "ログインに失敗しました") }
         } else {
             auth.createUserWithEmailAndPassword(email, pass)
                 .addOnSuccessListener { onResult(true, null) }
