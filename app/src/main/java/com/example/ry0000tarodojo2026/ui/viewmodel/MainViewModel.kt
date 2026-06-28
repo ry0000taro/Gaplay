@@ -88,8 +88,17 @@ class MainViewModel @Inject constructor(
         ) }
         timerManager.start(videoSeconds, exerciseSec)
         
+        // 合計時間（動画時間 ＋ 運動時間）を計算
+        val totalSeconds = videoSeconds + exerciseSec
+        
         // 視聴履歴の保存
-        historyRepository.saveWatchHistory(video.id, video.title)
+        historyRepository.saveWatchHistory(
+            videoId = video.id, 
+            videoTitle = video.title, 
+            videoDurationSeconds = videoSeconds,
+            exerciseDurationSeconds = exerciseSec,
+            totalDurationSeconds = totalSeconds
+        )
     }
 
     fun updatePlayerMode(mode: PlayerMode){
