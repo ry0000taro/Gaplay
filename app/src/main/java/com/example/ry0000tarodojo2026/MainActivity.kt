@@ -22,6 +22,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.ry0000tarodojo2026.ui.components.PlayerOverlay
 import com.example.ry0000tarodojo2026.ui.viewmodel.PlayerMode
+import com.example.ry0000tarodojo2026.ui.viewmodel.AuthViewModel
+import com.example.ry0000tarodojo2026.ui.viewmodel.AuthState
+import com.example.ry0000tarodojo2026.ui.screens.AuthScreen
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -29,15 +32,28 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val viewModel: MainViewModel = hiltViewModel()
-            val navController = rememberNavController()
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val authViewModel: AuthViewModel = hiltViewModel()
+            val authState by authViewModel.authState.collectAsStateWithLifecycle()
 
             Ry0000tarodojo2026Theme {
-                // 全画面表示の時はボトムバーを隠す
-                val showBottomBar = uiState.playerMode != PlayerMode.FULL
+                when (authState) {
+                    is AuthState.Loading -> {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator()
+                        }
+                    }
+                    is AuthState.Unauthenticated -> {
+                        AuthScreen(viewModel = authViewModel)
+                    }
+                    is AuthState.Authenticated -> {
+                        val viewModel: MainViewModel = hiltViewModel()
+                        val navController = rememberNavController()
+                        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            
+                        // 全画面表示の時はボトムバーを隠す
+                        val showBottomBar = uiState.playerMode != PlayerMode.FULL
 
-                Scaffold(
+                        Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
                         if (showBottomBar) {
@@ -95,6 +111,8 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                         }
+                    }
+                }
                     }
                 }
             }
