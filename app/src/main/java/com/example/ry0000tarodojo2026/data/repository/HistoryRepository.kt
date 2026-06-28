@@ -13,7 +13,8 @@ class HistoryRepository @Inject constructor() {
         videoTitle: String, 
         videoDurationSeconds: Long,
         exerciseDurationSeconds: Long,
-        totalDurationSeconds: Long
+        totalDurationSeconds: Long,
+        exerciseType: String
     ) {
         val uid = auth.currentUser?.uid ?: return
         
@@ -23,6 +24,7 @@ class HistoryRepository @Inject constructor() {
             "videoDurationSeconds" to videoDurationSeconds,
             "exerciseDurationSeconds" to exerciseDurationSeconds,
             "totalDurationSeconds" to totalDurationSeconds,
+            "exerciseType" to exerciseType,
             "savedAt" to System.currentTimeMillis()
         )
 
