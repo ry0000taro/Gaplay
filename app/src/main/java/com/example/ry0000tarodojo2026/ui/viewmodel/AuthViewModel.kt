@@ -14,16 +14,23 @@ class AuthViewModel @Inject constructor() : ViewModel() {
     private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
     val authState: StateFlow<AuthState> = _authState
 
+    private val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+        val user = firebaseAuth.currentUser
+        _authState.value = if (user != null) {
+            AuthState.Authenticated(user.uid)
+        } else {
+            AuthState.Unauthenticated
+        }
+    }
+
     init {
         // ログイン状態の監視
-        auth.addAuthStateListener { firebaseAuth ->
-            val user = firebaseAuth.currentUser
-            _authState.value = if (user != null) {
-                AuthState.Authenticated(user.uid)
-            } else {
-                AuthState.Unauthenticated
-            }
-        }
+        auth.addAuthStateListener(authStateListener)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        auth.removeAuthStateListener(authStateListener)
     }
 
     fun loginOrRegister(email: String, pass: String, isLogin: Boolean, onResult: (Boolean, String?) -> Unit) {
