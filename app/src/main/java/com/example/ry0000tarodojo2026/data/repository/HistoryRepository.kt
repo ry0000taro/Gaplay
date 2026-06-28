@@ -25,7 +25,7 @@ class HistoryRepository @Inject constructor() {
             "exerciseDurationSeconds" to exerciseDurationSeconds,
             "totalDurationSeconds" to totalDurationSeconds,
             "exerciseType" to exerciseType,
-            "savedAt" to System.currentTimeMillis()
+            "savedAt" to com.google.firebase.firestore.FieldValue.serverTimestamp()
         )
 
         db.collection("users").document(uid).collection("watch_history")
