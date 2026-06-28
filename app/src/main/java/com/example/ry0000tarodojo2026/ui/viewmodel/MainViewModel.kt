@@ -6,6 +6,7 @@ import com.example.ry0000tarodojo2026.data.local.SearchPrefs
 import com.example.ry0000tarodojo2026.data.model.ExerciseType
 import com.example.ry0000tarodojo2026.data.model.VideoEntity
 import com.example.ry0000tarodojo2026.data.repository.YouTubeRepository
+import com.example.ry0000tarodojo2026.data.repository.HistoryRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +18,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repository: YouTubeRepository,
-    private val searchPrefs: SearchPrefs
+    private val searchPrefs: SearchPrefs,
+    private val historyRepository: HistoryRepository
 ) : ViewModel() {
 
     // タイマーの専門家を用意（工程1で作成予定）
@@ -85,6 +87,19 @@ class MainViewModel @Inject constructor(
             playerMode = PlayerMode.FULL
         ) }
         timerManager.start(videoSeconds, exerciseSec)
+        
+        // 合計時間（動画時間 ＋ 運動時間）を計算
+        val totalSeconds = videoSeconds + exerciseSec
+        
+        // 視聴履歴の保存
+        historyRepository.saveWatchHistory(
+            videoId = video.id, 
+            videoTitle = video.title, 
+            videoDurationSeconds = videoSeconds,
+            exerciseDurationSeconds = exerciseSec,
+            totalDurationSeconds = totalSeconds,
+            exerciseType = _uiState.value.exerciseType.id
+        )
     }
 
     fun updatePlayerMode(mode: PlayerMode){
