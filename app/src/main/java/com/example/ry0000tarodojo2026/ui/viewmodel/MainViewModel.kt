@@ -97,7 +97,8 @@ class MainViewModel @Inject constructor(
             videoTitle = video.title, 
             videoDurationSeconds = videoSeconds,
             exerciseDurationSeconds = exerciseSec,
-            totalDurationSeconds = totalSeconds
+            totalDurationSeconds = totalSeconds,
+            exerciseType = _uiState.value.exerciseType.id
         )
     }
 
