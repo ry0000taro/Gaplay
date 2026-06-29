@@ -1,6 +1,7 @@
 package com.example.ry0000tarodojo2026.data.repository
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import javax.inject.Inject
 
@@ -25,7 +26,7 @@ class HistoryRepository @Inject constructor() {
             "exerciseDurationSeconds" to exerciseDurationSeconds,
             "totalDurationSeconds" to totalDurationSeconds,
             "exerciseType" to exerciseType,
-            "savedAt" to System.currentTimeMillis()
+            "savedAt" to FieldValue.serverTimestamp()
         )
 
         db.collection("users").document(uid).collection("watch_history")
