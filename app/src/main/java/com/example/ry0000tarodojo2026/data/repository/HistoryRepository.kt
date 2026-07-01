@@ -18,25 +18,28 @@ class HistoryRepository @Inject constructor(
         exerciseDurationSeconds: Long,
         totalDurationSeconds: Long,
         exerciseType: String
-    ) {
-        val uid = auth.currentUser?.uid ?: return
-        
-        val historyData = hashMapOf(
-            "videoId" to videoId,
-            "title" to videoTitle,
-            "videoDurationSeconds" to videoDurationSeconds,
-            "exerciseDurationSeconds" to exerciseDurationSeconds,
-            "totalDurationSeconds" to totalDurationSeconds,
-            "exerciseType" to exerciseType,
-            "savedAt" to FieldValue.serverTimestamp()
-        )
+    ): Result<Unit> {
+        return try {
+            val uid = auth.currentUser?.uid ?: throw IllegalStateException("ユーザーがログインしていません")
+            
+            val historyData = hashMapOf(
+                "videoId" to videoId,
+                "title" to videoTitle,
+                "videoDurationSeconds" to videoDurationSeconds,
+                "exerciseDurationSeconds" to exerciseDurationSeconds,
+                "totalDurationSeconds" to totalDurationSeconds,
+                "exerciseType" to exerciseType,
+                "savedAt" to FieldValue.serverTimestamp()
+            )
 
-        try {
             db.collection("users").document(uid).collection("watch_history")
                 .add(historyData)
                 .await()
+            
+            Result.success(Unit)
         } catch (e: Exception) {
             e.printStackTrace()
+            Result.failure(e)
         }
     }
 }

@@ -93,7 +93,7 @@ class MainViewModel @Inject constructor(
         
         // 視聴履歴の保存
         viewModelScope.launch {
-            historyRepository.saveWatchHistory(
+            val result = historyRepository.saveWatchHistory(
                 videoId = video.id, 
                 videoTitle = video.title, 
                 videoDurationSeconds = videoSeconds,
@@ -101,6 +101,12 @@ class MainViewModel @Inject constructor(
                 totalDurationSeconds = totalSeconds,
                 exerciseType = _uiState.value.exerciseType.id
             )
+            
+            // エラー時（未ログインや通信失敗など）の処理をここで検知できるようになった
+            result.onFailure { exception ->
+                // 例：ログに出力したり、SnackBarで「保存に失敗しました」と表示するための状態を更新したりする
+                exception.printStackTrace()
+            }
         }
     }
 
