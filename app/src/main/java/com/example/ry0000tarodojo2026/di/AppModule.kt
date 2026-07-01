@@ -6,6 +6,8 @@ import com.example.ry0000tarodojo2026.data.api.RetrofitInstance
 import com.example.ry0000tarodojo2026.data.local.AppDatabase
 import com.example.ry0000tarodojo2026.data.local.SearchPrefs
 import com.example.ry0000tarodojo2026.data.repository.YouTubeRepository
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,5 +41,17 @@ object AppModule {
     @Singleton
     fun provideYouTubeRepository(db: AppDatabase): YouTubeRepository {
         return YouTubeRepository(RetrofitInstance.api, db.videoDao())
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirebaseAuth(): FirebaseAuth {
+        return FirebaseAuth.getInstance()
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirebaseFirestore(): FirebaseFirestore {
+        return FirebaseFirestore.getInstance()
     }
 }

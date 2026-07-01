@@ -5,9 +5,10 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import javax.inject.Inject
 
-class HistoryRepository @Inject constructor() {
-    private val db = FirebaseFirestore.getInstance()
-    private val auth = FirebaseAuth.getInstance()
+class HistoryRepository @Inject constructor(
+    private val db: FirebaseFirestore,
+    private val auth: FirebaseAuth
+) {
 
     fun saveWatchHistory(
         videoId: String, 
