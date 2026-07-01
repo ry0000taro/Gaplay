@@ -92,14 +92,16 @@ class MainViewModel @Inject constructor(
         val totalSeconds = videoSeconds + exerciseSec
         
         // 視聴履歴の保存
-        historyRepository.saveWatchHistory(
-            videoId = video.id, 
-            videoTitle = video.title, 
-            videoDurationSeconds = videoSeconds,
-            exerciseDurationSeconds = exerciseSec,
-            totalDurationSeconds = totalSeconds,
-            exerciseType = _uiState.value.exerciseType.id
-        )
+        viewModelScope.launch {
+            historyRepository.saveWatchHistory(
+                videoId = video.id, 
+                videoTitle = video.title, 
+                videoDurationSeconds = videoSeconds,
+                exerciseDurationSeconds = exerciseSec,
+                totalDurationSeconds = totalSeconds,
+                exerciseType = _uiState.value.exerciseType.id
+            )
+        }
     }
 
     fun updatePlayerMode(mode: PlayerMode){
