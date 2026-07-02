@@ -23,13 +23,29 @@ fun MainBottomBar(navController: NavController) {
             icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
             label = { Text("Home") },
             selected = currentRoute == com.example.ry0000tarodojo2026.Routes.SEARCH_LIST || currentRoute?.startsWith("timer_player") == true,
-            onClick = { /* TODO: Navigate to Home */ }
+            onClick = {
+                if (currentRoute != com.example.ry0000tarodojo2026.Routes.SEARCH_LIST) {
+                    navController.navigate(com.example.ry0000tarodojo2026.Routes.SEARCH_LIST) {
+                        popUpTo(navController.graph.startDestinationId) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            }
         )
         NavigationBarItem(
             icon = { Icon(Icons.Default.QrCodeScanner, contentDescription = "Scan") },
             label = { Text("Scan") },
-            selected = false,
-            onClick = { /* TODO: Navigate to Scan */ }
+            selected = currentRoute == com.example.ry0000tarodojo2026.Routes.SCAN,
+            onClick = {
+                if (currentRoute != com.example.ry0000tarodojo2026.Routes.SCAN) {
+                    navController.navigate(com.example.ry0000tarodojo2026.Routes.SCAN) {
+                        popUpTo(navController.graph.startDestinationId) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                }
+            }
         )
         NavigationBarItem(
             icon = { Icon(Icons.Default.History, contentDescription = "History") },
