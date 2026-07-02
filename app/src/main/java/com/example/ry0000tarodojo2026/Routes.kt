@@ -4,6 +4,7 @@ package com.example.ry0000tarodojo2026
 object Routes {
     const val AUTH = "auth"
     const val SEARCH_LIST = "search_list"    // 検索結果のリスト画面
+    const val SCAN = "scan"                  // スキャン画面
     const val HISTORY = "history"
     const val TIMER_PLAYER = "timer_player"  // タイマーと動画再生の画面
 }
