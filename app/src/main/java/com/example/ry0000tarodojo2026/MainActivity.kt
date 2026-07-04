@@ -97,7 +97,10 @@ class MainActivity : ComponentActivity() {
                                     )
                                 }
                                 composable(Routes.SCAN) {
-                                    com.example.ry0000tarodojo2026.ui.screens.ScanScreen()
+                                    com.example.ry0000tarodojo2026.ui.screens.ScanScreen(
+                                        viewModel = viewModel,
+                                        navController = navController
+                                    )
                                 }
                             }
                         }
