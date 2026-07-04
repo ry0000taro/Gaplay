@@ -11,9 +11,15 @@ import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
 
+import androidx.navigation.NavController
+import com.example.ry0000tarodojo2026.Routes
+import com.example.ry0000tarodojo2026.ui.viewmodel.MainViewModel
+
 @Composable
-fun ScanScreen() {
+fun ScanScreen(viewModel: MainViewModel, navController: NavController) {
     var scannedBarcode by remember { mutableStateOf<String?>(null) }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
 
     Column(
@@ -21,9 +27,14 @@ fun ScanScreen() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (scannedBarcode == null) {
+        if (isLoading) {
+            CircularProgressIndicator()
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("カップ麺のデータを検索中...")
+        } else if (scannedBarcode == null) {
             Button(
                 onClick = {
+                    errorMessage = null
                     val options = GmsBarcodeScannerOptions.Builder()
                         .setBarcodeFormats(Barcode.FORMAT_EAN_13, Barcode.FORMAT_EAN_8)
                         .enableAutoZoom()
@@ -31,7 +42,24 @@ fun ScanScreen() {
                     val scanner = GmsBarcodeScanning.getClient(context, options)
                     scanner.startScan()
                         .addOnSuccessListener { barcode ->
-                            scannedBarcode = barcode.rawValue
+                            val code = barcode.rawValue
+                            if (code != null) {
+                                isLoading = true
+                                viewModel.searchNoodle(
+                                    janCode = code,
+                                    onSuccess = {
+                                        isLoading = false
+                                        navController.navigate(Routes.SEARCH_LIST) {
+                                            popUpTo(Routes.SEARCH_LIST) { inclusive = true }
+                                        }
+                                    },
+                                    onError = { error ->
+                                        isLoading = false
+                                        scannedBarcode = code
+                                        errorMessage = error
+                                    }
+                                )
+                            }
                         }
                         .addOnFailureListener { e ->
                             e.printStackTrace()
@@ -51,9 +79,20 @@ fun ScanScreen() {
                 text = scannedBarcode ?: "",
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(bottom = 32.dp)
+                modifier = Modifier.padding(bottom = 16.dp)
             )
-            Button(onClick = { scannedBarcode = null }) {
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage!!,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(bottom = 32.dp)
+                )
+            }
+            Button(onClick = {
+                scannedBarcode = null
+                errorMessage = null
+            }) {
                 Text("戻る（再スキャン）")
             }
         }
