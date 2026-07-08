@@ -136,7 +136,7 @@ class MainViewModel @Inject constructor(
             val result = noodleRepository.getNoodleInfo(janCode)
             result.onSuccess { noodle ->
                 // Noodle情報が取得できたら、検索条件を更新してHome画面へ遷移させる
-                searchPrefs.saveSearchConditions(noodle.name, noodle.time_minutes.toString(), _uiState.value.exerciseType)
+                searchPrefs.saveSearchConditions(noodle.name, noodle.timeMinutes.toString(), _uiState.value.exerciseType)
                 onSuccess()
             }.onFailure { throwable ->
                 val message = when (throwable) {

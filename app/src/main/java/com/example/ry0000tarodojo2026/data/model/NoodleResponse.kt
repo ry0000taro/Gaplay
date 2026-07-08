@@ -1,7 +1,11 @@
 package com.example.ry0000tarodojo2026.data.model
 
+import com.google.gson.annotations.SerializedName
+
 data class NoodleResponse(
-    val jan_code: String,
+    @SerializedName("jan_code")
+    val janCode: String,
     val name: String,
-    val time_minutes: Int
+    @SerializedName("time_minutes")
+    val timeMinutes: Int
 )
