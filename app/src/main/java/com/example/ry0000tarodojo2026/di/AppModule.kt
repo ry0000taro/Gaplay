@@ -15,9 +15,35 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+import com.example.ry0000tarodojo2026.data.api.NoodleApiService
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import com.example.ry0000tarodojo2026.BuildConfig
+
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
+
+    @Provides
+    @Singleton
+    fun provideNoodleApiService(): NoodleApiService {
+        val client = OkHttpClient.Builder().apply {
+            if (BuildConfig.DEBUG) {
+                val logging = HttpLoggingInterceptor()
+                logging.setLevel(HttpLoggingInterceptor.Level.BODY)
+                addInterceptor(logging)
+            }
+        }.build()
+
+        return Retrofit.Builder()
+            .baseUrl("http://10.0.2.2:3000/")
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(NoodleApiService::class.java)
+    }
 
     //データベースの作り方を教える
     @Provides

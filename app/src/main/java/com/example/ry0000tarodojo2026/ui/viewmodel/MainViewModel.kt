@@ -12,6 +12,8 @@ import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
+import com.example.ry0000tarodojo2026.data.repository.NoodleRepository
+
 /**
  * 画面のデータを管理する監督役（ViewModel）
  */
@@ -19,7 +21,8 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val repository: YouTubeRepository,
     private val searchPrefs: SearchPrefs,
-    private val historyRepository: HistoryRepository
+    private val historyRepository: HistoryRepository,
+    private val noodleRepository: NoodleRepository
 ) : ViewModel() {
 
     // タイマーの専門家を用意（工程1で作成予定）
@@ -126,6 +129,25 @@ class MainViewModel @Inject constructor(
     fun onBackToList() {
         _uiState.update { it.copy(selectedVideo = null) }
         timerManager.stop()
+    }
+
+    fun searchNoodle(janCode: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        viewModelScope.launch {
+            val result = noodleRepository.getNoodleInfo(janCode)
+            result.onSuccess { noodle ->
+                // Noodle情報が取得できたら、検索条件を更新してHome画面へ遷移させる
+                searchPrefs.saveSearchConditions(noodle.name, noodle.timeMinutes.toString(), _uiState.value.exerciseType)
+                onSuccess()
+            }.onFailure { throwable ->
+                val message = when (throwable) {
+                    is retrofit2.HttpException ->
+                        if (throwable.code() == 404) "カップ麺のデータが見つかりませんでした" else "サーバーエラーが発生しました (${throwable.code()})"
+                    is java.io.IOException -> "通信に失敗しました。ネットワークを確認してください"
+                    else -> "予期しないエラーが発生しました"
+                }
+                onError(message)
+            }
+        }
     }
 
     private fun parseDurationToSeconds(id: String, duration: String?): Long {
