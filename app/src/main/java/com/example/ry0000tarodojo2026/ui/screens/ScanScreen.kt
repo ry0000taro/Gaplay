@@ -58,7 +58,8 @@ fun ScanScreen(viewModel: MainViewModel, navController: NavController) {
                                     onSuccess = {
                                         isLoading = false
                                         navController.navigate(Routes.SEARCH_LIST) {
-                                            popUpTo(Routes.SEARCH_LIST) { inclusive = true }
+                                            popUpTo(Routes.SEARCH_LIST) { inclusive = false }
+                                            launchSingleTop = true
                                         }
                                     },
                                     onError = { error ->
