@@ -32,6 +32,14 @@ fun ScanScreen(viewModel: MainViewModel, navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
             Text("カップ麺のデータを検索中...")
         } else if (scannedBarcode == null) {
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage!!,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+            }
             Button(
                 onClick = {
                     errorMessage = null
@@ -59,10 +67,13 @@ fun ScanScreen(viewModel: MainViewModel, navController: NavController) {
                                         errorMessage = error
                                     }
                                 )
+                            } else {
+                                errorMessage = "バーコードの値を読み取れませんでした"
                             }
                         }
                         .addOnFailureListener { e ->
                             e.printStackTrace()
+                            errorMessage = "スキャンに失敗したか、キャンセルされました"
                         }
                 },
                 modifier = Modifier.size(200.dp, 80.dp)
