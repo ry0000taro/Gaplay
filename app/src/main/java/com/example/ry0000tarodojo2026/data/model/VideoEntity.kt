@@ -10,6 +10,7 @@ data class VideoEntity(
     val title: String,
     val thumbnailUrl: String,
     val channelTitle: String,
+    val channelId: String,
     val duration: String?, // 以前話した「カップ麺の待ち時間」に合う動画選びで重要ですね
     val savedAt: Long = System.currentTimeMillis() // キャッシュの鮮度管理用
 )
