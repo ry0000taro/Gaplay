@@ -1,5 +1,6 @@
 package com.example.ry0000tarodojo2026.data.api
 
+import com.example.ry0000tarodojo2026.data.model.ChannelResponse
 import com.example.ry0000tarodojo2026.data.model.YouTubeSearchResponse
 import com.example.ry0000tarodojo2026.data.model.VideoDetailsResponse
 import retrofit2.http.GET
@@ -41,5 +42,11 @@ interface YouTubeApiService {
         @Query("key") apiKey: String
     ): VideoDetailsResponse
 
+    @GET("channels")
+    suspend fun getChannelDetails(
+        @Query("part") part: String = "snippet",
+        @Query("id") channelId: String,
+        @Query("key") apiKey: String
+    ): ChannelResponse
 
 }
