@@ -138,8 +138,14 @@ class MainViewModel @Inject constructor(
                 // Noodle情報が取得できたら、検索条件を更新してHome画面へ遷移させる
                 searchPrefs.saveSearchConditions(noodle.name, noodle.time_minutes.toString(), _uiState.value.exerciseType)
                 onSuccess()
-            }.onFailure {
-                onError("カップ麺のデータが見つかりませんでした")
+            }.onFailure { throwable ->
+                val message = when (throwable) {
+                    is retrofit2.HttpException ->
+                        if (throwable.code() == 404) "カップ麺のデータが見つかりませんでした" else "サーバーエラーが発生しました (${throwable.code()})"
+                    is java.io.IOException -> "通信に失敗しました。ネットワークを確認してください"
+                    else -> "予期しないエラーが発生しました"
+                }
+                onError(message)
             }
         }
     }
