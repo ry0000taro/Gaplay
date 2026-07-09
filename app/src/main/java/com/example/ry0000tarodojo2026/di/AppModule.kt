@@ -52,7 +52,8 @@ object AppModule {
         return Room.databaseBuilder(
             context,
             AppDatabase::class.java, "youtube-db"
-        ).build()
+        ).fallbackToDestructiveMigration()
+        .build()
     }
 
     //設定ファイルの作り方を教える
@@ -66,7 +67,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideYouTubeRepository(db: AppDatabase): YouTubeRepository {
-        return YouTubeRepository(RetrofitInstance.api, db.videoDao())
+        return YouTubeRepository(RetrofitInstance.api, db.videoDao(), db.channelDao())
     }
 
     @Provides
