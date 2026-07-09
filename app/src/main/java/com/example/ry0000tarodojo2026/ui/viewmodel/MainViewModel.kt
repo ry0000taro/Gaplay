@@ -161,4 +161,8 @@ class MainViewModel @Inject constructor(
             180L
         }
     }
+
+    suspend fun getChannelIconUrl(channelId: String): String? {
+        return repository.getChannelIconUrl(channelId)
+    }
 }

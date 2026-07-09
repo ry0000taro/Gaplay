@@ -30,7 +30,8 @@ fun PlayerOverlay(
     bottomPadding: Dp,
     onCollapse: () -> Unit,
     onExpand: () -> Unit,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    getChannelIcon: suspend (String) -> String?
 ) {
     val videoId = uiState.selectedVideo?.id
     val videoPlayer = remember(videoId) {
@@ -72,6 +73,7 @@ fun PlayerOverlay(
                             exerciseType = uiState.exerciseType,
                             onBack = onCollapse,
                             sharedBoundsModifier = sharedMod,
+                            getChannelIcon = getChannelIcon,
                             videoPlayerContent = {
                                 Box(
                                     modifier = Modifier.fillMaxSize()

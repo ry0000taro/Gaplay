@@ -21,7 +21,8 @@ fun SearchListScreen(
     initialQuery: String,
     isLoading: Boolean,
     onSearch: (String, Long, ExerciseType) -> Unit,
-    onVideoSelect: (VideoEntity) -> Unit
+    onVideoSelect: (VideoEntity) -> Unit,
+    getChannelIcon: suspend (String) -> String?
 ) {
     val targetSeconds = (targetMinutes.toLongOrNull() ?: 3L) * 60
 
@@ -48,7 +49,8 @@ fun SearchListScreen(
                     VideoItemRow(
                         video = video,
                         exerciseTimeText = exerciseText,
-                        exerciseType = exerciseType
+                        exerciseType = exerciseType,
+                        getChannelIcon = getChannelIcon
                     )
                 }
             }

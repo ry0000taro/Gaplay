@@ -41,6 +41,7 @@ fun TimerPlayerScreen(
     exerciseType: ExerciseType,
     onBack: () -> Unit,
     sharedBoundsModifier: Modifier = Modifier,
+    getChannelIcon: suspend (String) -> String?,
     videoPlayerContent: @Composable () -> Unit
 )
 {
@@ -97,6 +98,10 @@ fun TimerPlayerScreen(
                 180L
             }
         } catch (e: Exception) { 180L }
+    }
+
+    val iconUrl by produceState<String?>(initialValue = null, video.channelId) {
+        value = getChannelIcon(video.channelId)
     }
 
     Column(
@@ -373,12 +378,26 @@ fun TimerPlayerScreen(
                     modifier = Modifier.padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = "Channel Icon",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(40.dp)
-                    )
+                    if (iconUrl != null) {
+                        coil.compose.AsyncImage(
+                            model = coil.request.ImageRequest.Builder(LocalContext.current)
+                                .data(iconUrl)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = "Channel Icon",
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape),
+                            contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = "Channel Icon",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(40.dp)
+                        )
+                    }
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
                         Text(
