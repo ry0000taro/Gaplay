@@ -6,7 +6,7 @@ import com.example.ry0000tarodojo2026.data.model.VideoEntity
 import com.example.ry0000tarodojo2026.data.model.ChannelEntity
 
 // 管理するEntityとバージョンを指定
-@Database(entities = [VideoEntity::class], version = 2, exportSchema = false)
+@Database(entities = [VideoEntity::class, ChannelEntity::class], version = 2, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     // DAOを取得するための窓口
     abstract fun videoDao(): VideoDao
