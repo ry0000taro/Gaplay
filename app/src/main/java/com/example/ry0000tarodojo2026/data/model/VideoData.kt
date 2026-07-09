@@ -22,6 +22,7 @@ fun VideoItem.toEntity(): VideoEntity {
         title = this.snippet.title,
         thumbnailUrl = this.snippet.thumbnails.high.url,
         channelTitle = this.snippet.channelTitle,
+        channelId = this.snippet.channelId,
         duration = null, // APIの別エンドポイントが必要なため一旦null
         savedAt = System.currentTimeMillis()
     )
