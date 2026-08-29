@@ -188,4 +188,4 @@ com.example.ry0000tarodojo2026/
 
 ## 📄 ライセンス
 
-[MIT License](LICENSE) (またはプロジェクトに適したライセンスを記載してください)
+[MIT License](LICENSE)
