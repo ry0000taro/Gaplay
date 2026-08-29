@@ -172,7 +172,7 @@ npm run dev        # http://localhost:3000
 com.example.ry0000tarodojo2026/
 ├── data/
 │   ├── api/        # YouTube API (Retrofit)
-│   ├── local/      # Room Database, SharedPrefs
+│   ├── local/      # Room Database, DataStore
 │   ├── model/      # Data Classes, Enums
 │   └── repository/ # Repository implementation
 ├── di/             # Hilt Modules
