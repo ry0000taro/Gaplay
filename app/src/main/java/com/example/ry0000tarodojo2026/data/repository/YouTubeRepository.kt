@@ -6,11 +6,15 @@ import android.util.Log
 import com.example.ry0000tarodojo2026.data.local.VideoDao
 import com.example.ry0000tarodojo2026.data.model.VideoData
 import com.example.ry0000tarodojo2026.data.model.VideoEntity
+import com.example.ry0000tarodojo2026.data.local.ChannelDao
+import com.example.ry0000tarodojo2026.data.model.ChannelEntity
+import com.example.ry0000tarodojo2026.BuildConfig
 import kotlinx.coroutines.flow.Flow
 
 class YouTubeRepository(
     private val apiService: YouTubeApiService,
-    private val dao: VideoDao
+    private val dao: VideoDao,
+    private val channelDao: ChannelDao
 
 ) {
     val allVideos: Flow<List<VideoEntity>> = dao.getAllVideos()
@@ -36,6 +40,7 @@ class YouTubeRepository(
                     title = item.snippet.title,
                     thumbnailUrl = item.snippet.thumbnails.high.url,
                     channelTitle = item.snippet.channelTitle,
+                    channelId = item.snippet.channelId,
                     duration = formatDurationString(item.contentDetails.duration),
                     savedAt = System.currentTimeMillis()
                 )
@@ -150,6 +155,30 @@ class YouTubeRepository(
         return dao.getVideoById(videoId)
     }
 
+    suspend fun getChannelIconUrl(channelId: String): String? {
+        val cached = channelDao.getChannelById(channelId)
+        if(cached != null){
+            return cached.iconUrl
+        }
+
+        return try{
+            val response = apiService.getChannelDetails(
+                channelId = channelId,
+                apiKey = BuildConfig.YOUTUBE_API_KEY
+            )
+
+            val iconUrl = response.items?.firstOrNull()?.snippet?.thumbnails?.high?.url
+
+            if (iconUrl != null) {
+                channelDao.insertChannel(ChannelEntity(channelId, iconUrl))
+            }
+            iconUrl
+        } catch (e: Exception) {
+            Log.e("YouTubeRepository", "Channel fetch error", e)
+            null
+
+        }
+    }
 
 
 }

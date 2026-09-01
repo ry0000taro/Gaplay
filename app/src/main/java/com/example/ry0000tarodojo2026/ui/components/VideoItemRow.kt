@@ -5,6 +5,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,8 +23,12 @@ import com.example.ry0000tarodojo2026.data.model.VideoEntity
 fun VideoItemRow(
     video: VideoEntity,
     exerciseTimeText: String,
-    exerciseType: ExerciseType
+    exerciseType: ExerciseType,
+    getChannelIcon: suspend (String) -> String?
 ) {
+    val iconUrl by androidx.compose.runtime.produceState<String?>(initialValue = null, video.channelId) {
+        value = getChannelIcon(video.channelId)
+    }
     ElevatedCard(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -53,12 +59,26 @@ fun VideoItemRow(
 
             Column(modifier = Modifier.padding(16.dp)) {
                 Row(verticalAlignment = Alignment.Top) {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = null,
-                        modifier = Modifier.size(40.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
+                    if (iconUrl != null) {
+                        AsyncImage(
+                            model = coil.request.ImageRequest.Builder(androidx.compose.ui.platform.LocalContext.current)
+                                .data(iconUrl)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = "Channel Icon",
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(androidx.compose.foundation.shape.CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.AccountCircle,
+                            contentDescription = null,
+                            modifier = Modifier.size(40.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(

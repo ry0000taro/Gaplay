@@ -93,6 +93,9 @@ class MainActivity : ComponentActivity() {
                                         onVideoSelect = { video ->
                                             // 画面遷移せず、状態を更新してプレイヤーを表示
                                             viewModel.onVideoSelect(video)
+                                        },
+                                        getChannelIcon = { channelId ->
+                                            viewModel.getChannelIconUrl(channelId)
                                         }
                                     )
                                 }
@@ -113,7 +116,8 @@ class MainActivity : ComponentActivity() {
                                     bottomPadding = innerPadding.calculateBottomPadding(),
                                     onCollapse = { viewModel.updatePlayerMode(PlayerMode.MINI) },
                                     onExpand = { viewModel.updatePlayerMode(PlayerMode.FULL) },
-                                    onClose = { viewModel.closePlayer() }
+                                    onClose = { viewModel.closePlayer() },
+                                    getChannelIcon = { channelId -> viewModel.getChannelIconUrl(channelId) }
                                 )
                             }
                         }
